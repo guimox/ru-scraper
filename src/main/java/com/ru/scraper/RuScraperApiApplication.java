@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import java.util.function.Function;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.scraper.ruscraperapi")
+@ComponentScan(basePackages = "com.ru.scraper")
 public class RuScraperApiApplication {
     private final ScrapService scrapService;
 
