@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.ru.scraper")
@@ -23,12 +24,13 @@ public class RuScraperApiApplication {
     }
 
     @Bean
-    public Function<Map<String, Object>, Object> scraperMenu() {
-        return (input) -> {
+    public Supplier<Object> scraperMenu() {
+        return () -> {
             try {
-                System.out.println("Received input: " + input);
+                System.out.println("Scraper function triggered at: " + System.currentTimeMillis());
                 return scrapService.scrape();
             } catch (Exception e) {
+                System.out.println("Error occurred at: " + System.currentTimeMillis());
                 e.printStackTrace();
                 return "Error: " + e.getMessage();
             }
