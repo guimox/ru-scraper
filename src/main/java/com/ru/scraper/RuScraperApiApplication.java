@@ -4,14 +4,10 @@ import com.ru.scraper.service.ScrapService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 
-import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.ru.scraper")
 public class RuScraperApiApplication {
     private final ScrapService scrapService;
 
