@@ -26,9 +26,9 @@
         </profile>
     </profiles>
     <groupId>com.scraper</groupId>
-    <artifactId>ru-menu-scraper</artifactId>
-    <name>ru-menu-scraper</name>
-    <description>ru-menu-scraper</description>
+    <artifactId>ru-scraper</artifactId>
+    <name>ru-scraper</name>
+    <description>ru-scraper</description>
     <properties>
         <java.version>17</java.version>
         <wrapper.version>1.0.29.RELEASE</wrapper.version>

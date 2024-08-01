@@ -8,9 +8,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.scraper</groupId>
-  <artifactId>ru-menu-scraper</artifactId>
-  <name>ru-menu-scraper</name>
-  <description>ru-menu-scraper</description>
+  <artifactId>ru-scraper</artifactId>
+  <name>ru-scraper</name>
+  <description>ru-scraper</description>
   <build>
     <finalName>${project.artifactId}</finalName>
     <plugins>
