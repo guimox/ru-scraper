@@ -29,6 +29,7 @@ public class ScraperRU implements IScraperRU {
 
     private Document connectScraper(String webURL) {
         try {
+            System.out.println("Trying to connect to " + webURL);
             return Jsoup.connect(webURL).get();
         } catch (IOException e) {
             System.err.println("Failed to retrieve menu: " + e.getMessage());
@@ -40,9 +41,8 @@ public class ScraperRU implements IScraperRU {
     public Elements parseTableHtml(String ruCode) {
         Document htmlDocument = this.connectScraper(ruUrl);
         String localDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM"));
+        System.out.println("Trying to get a menu for the day " + localDate);
         Element titleContainingDate = htmlDocument.selectFirst("p:contains(" + localDate + ")");
-        System.out.println(ruUrl);
-        System.out.println(localDate);
         Element menuFromWeekday = titleContainingDate.nextElementSibling();
         return menuFromWeekday.select("table tbody tr");
     }
