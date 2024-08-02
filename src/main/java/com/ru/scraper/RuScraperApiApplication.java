@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
 @SpringBootApplication
@@ -19,11 +20,12 @@ public class RuScraperApiApplication {
         SpringApplication.run(RuScraperApiApplication.class, args);
     }
 
+
     @Bean
     public Supplier<Object> scraperMenu() {
         return () -> {
             try {
-                System.out.println("Scraper function triggered at: " + System.currentTimeMillis());
+                System.out.println("Scraper function triggered at: " + LocalDateTime.now());
                 return scrapService.scrape();
             } catch (Exception e) {
                 System.out.println("Error occurred at: " + System.currentTimeMillis());
@@ -31,4 +33,5 @@ public class RuScraperApiApplication {
                 return "Error: " + e.getMessage();
             }
         };
-    }}
+    }
+}
