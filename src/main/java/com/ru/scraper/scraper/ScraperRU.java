@@ -27,13 +27,25 @@ public class ScraperRU implements IScraperRU {
         this.scraperHelper = scraperHelper;
     }
 
-    private Document connectScraper(String webURL) {
-        try {
-            System.out.println("Trying to connect to " + webURL);
-            return Jsoup.connect(webURL).timeout(30000).get();
-        } catch (IOException e) {
-            System.err.println("Failed to retrieve menu: " + e.getMessage());
+    private Document connectScraper(String webURL) throws InterruptedException {
+        int retryCount = 3;
+        int timeout = 30000; // 30 seconds
+
+        while (retryCount > 0) {
+            try {
+                return Jsoup.connect(webURL)
+                        .timeout(timeout)
+                        .get();
+            } catch (IOException e) {
+                retryCount--;
+                if (retryCount > 0) {
+                    Thread.sleep(5000); // 5 second delay
+                } else {
+                    throw new RuntimeException("Failed to retrieve content from " + webURL, e);
+                }
+            }
         }
+
         return null;
     }
 
