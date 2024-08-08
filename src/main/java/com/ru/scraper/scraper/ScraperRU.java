@@ -50,7 +50,7 @@ public class ScraperRU implements IScraperRU {
     }
 
     @Override
-    public Elements parseTableHtml(String ruCode) {
+    public Elements parseTableHtml(String ruCode) throws InterruptedException {
         Document htmlDocument = this.connectScraper(ruUrl);
         String localDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM"));
         System.out.println("Trying to get a menu for the day " + localDate);

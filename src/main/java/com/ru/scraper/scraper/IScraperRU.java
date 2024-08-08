@@ -11,7 +11,7 @@ public interface IScraperRU {
 
     MealOption createMealOption(String contentPart, ScraperRU scraperRU);
 
-    Elements parseTableHtml(String ruCode);
+    Elements parseTableHtml(String ruCode) throws InterruptedException;
 
     String extractTextFromHtml(String htmlContent);
 
