@@ -30,7 +30,7 @@ public class ScraperRU implements IScraperRU {
     private Document connectScraper(String webURL) {
         try {
             System.out.println("Trying to connect to " + webURL);
-            return Jsoup.connect(webURL).get();
+            return Jsoup.connect(webURL).timeout(30000).get();
         } catch (IOException e) {
             System.err.println("Failed to retrieve menu: " + e.getMessage());
         }
