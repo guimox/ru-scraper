@@ -4,5 +4,5 @@ import com.ru.scraper.data.response.ResponseMenu;
 
 
 public interface IScrapService {
-    ResponseMenu scrape();
+    ResponseMenu scrape() throws InterruptedException;
 }

@@ -32,7 +32,7 @@ public class ScrapService implements IScrapService {
         this.scraperHelper = scraperHelper;
     }
 
-    public ResponseMenu scrape() {
+    public ResponseMenu scrape() throws InterruptedException {
         Elements mealRows = scraperRU.parseTableHtml(ruKey);
 
         System.out.println(ruKey);
