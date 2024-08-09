@@ -29,7 +29,7 @@ public class ScraperRU implements IScraperRU {
 
     private Document connectScraper(String webURL) throws InterruptedException {
         int retryCount = 3;
-        int timeout = 15000; // 15 seconds
+        int timeout = 30000; // 30 seconds
 
         while (retryCount > 0) {
             try {
