@@ -29,17 +29,19 @@ public class ScraperRU implements IScraperRU {
 
     private Document connectScraper(String webURL) throws InterruptedException {
         int retryCount = 3;
-        int timeout = 30000; // 30 seconds
+        int timeout = 15000; // 15 seconds
 
         while (retryCount > 0) {
             try {
+                System.out.println("Trying to connect to " + webURL + " retry number " + retryCount);
                 return Jsoup.connect(webURL)
                         .timeout(timeout)
                         .get();
             } catch (IOException e) {
+                System.out.println("Error when connecting " + e);
                 retryCount--;
                 if (retryCount > 0) {
-                    Thread.sleep(5000); // 5 second delay
+                    Thread.sleep(1000); // 1 second delay
                 } else {
                     throw new RuntimeException("Failed to retrieve content from " + webURL, e);
                 }

@@ -35,17 +35,18 @@ public class ScrapService implements IScrapService {
     public ResponseMenu scrape() throws InterruptedException {
         Elements mealRows = scraperRU.parseTableHtml(ruKey);
 
-        System.out.println(ruKey);
-
         if (mealRows == null) {
             throw new RuMenuNotFound("Menu not found with this date " + LocalDateTime.now());
         }
+
+        System.out.println("Menu parsed for the restaurant " + ruKey);
 
         Map<String, List<MealOption>> meals = new HashMap<>();
         List<MealOption> mealOptions = new ArrayList<>();
         List<String> served = new ArrayList<>();
         String mealPeriodTitle = null;
-        System.out.println(mealRows);
+
+        System.out.println("Meals found " + mealRows);
 
         for (Element element : mealRows) {
             Element tdElement = element.select("td").first();
