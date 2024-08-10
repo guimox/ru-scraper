@@ -4,22 +4,26 @@ import com.ru.scraper.data.meal.MealOption;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class ResponseMenu {
 
+    private Map<String, List<MealOption>> meals;
+    private List<String> served;
     private ZonedDateTime date;
+    private String imgMenu;
     private String ruName;
     private String ruUrl;
     private String ruCode;
-    private List<String> served;
-    private Map<String, List<MealOption>> meals;
 
-    public ResponseMenu() {
-        this.meals = new HashMap<>();
+    public String getImgMenu() {
+        return imgMenu;
+    }
+
+    public void setImgMenu(String imgMenu) {
+        this.imgMenu = imgMenu;
     }
 
     public String getRuName() {

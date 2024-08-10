@@ -8,4 +8,5 @@ import java.util.Map;
 
 public interface IResponseMenuBuilder {
     ResponseMenu createResponseMenu(Map<String, List<MealOption>> meals, List<String> served);
+    ResponseMenu createResponseMenuWithImg(String imgMenu);
 }

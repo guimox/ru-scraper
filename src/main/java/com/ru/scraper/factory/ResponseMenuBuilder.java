@@ -22,15 +22,27 @@ public class ResponseMenuBuilder implements IResponseMenuBuilder {
     @Value("${RU_NAME}")
     private String ruName;
 
-    @Override
-    public ResponseMenu createResponseMenu(Map<String, List<MealOption>> meals, List<String> served) {
+    public ResponseMenu buildBaseMenu() {
         ResponseMenu responseMenu = new ResponseMenu();
         responseMenu.setDate(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
         responseMenu.setRuCode(ruKey);
         responseMenu.setRuName(ruName);
         responseMenu.setRuUrl(ruUrl);
+        return responseMenu;
+    }
+
+    @Override
+    public ResponseMenu createResponseMenu(Map<String, List<MealOption>> meals, List<String> served) {
+        ResponseMenu responseMenu = buildBaseMenu();
         responseMenu.setMeals(meals);
         responseMenu.setServed(served);
+        return responseMenu;
+    }
+
+    @Override
+    public ResponseMenu createResponseMenuWithImg(String imgMenu) {
+        ResponseMenu responseMenu = buildBaseMenu();
+        responseMenu.setImgMenu(imgMenu);
         return responseMenu;
     }
 

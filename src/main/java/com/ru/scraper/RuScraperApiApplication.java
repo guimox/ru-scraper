@@ -20,7 +20,6 @@ public class RuScraperApiApplication {
         SpringApplication.run(RuScraperApiApplication.class, args);
     }
 
-
     @Bean
     public Supplier<Object> scraperMenu() {
         return () -> {

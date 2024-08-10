@@ -2,6 +2,7 @@ package com.ru.scraper.service;
 
 import com.ru.scraper.data.meal.MealOption;
 import com.ru.scraper.data.response.ResponseMenu;
+import com.ru.scraper.exception.MenuResult;
 import com.ru.scraper.exception.types.RuMenuNotFound;
 import com.ru.scraper.factory.ResponseMenuBuilder;
 import com.ru.scraper.helper.ScraperHelper;
@@ -20,22 +21,22 @@ import java.util.Map;
 @Service
 public class ScrapService implements IScrapService {
 
-    @Value("${RU_CODE}")
-    private String ruKey;
     private final ResponseMenuBuilder responseMenuBuilder;
     private final ScraperHelper scraperHelper;
     private final ScraperRU scraperRU;
+    @Value("${RU_CODE}")
+    private String ruKey;
 
     public ScrapService(ResponseMenuBuilder responseMenuBuilder, ScraperRU scraperRU, ScraperHelper scraperHelper) {
         this.responseMenuBuilder = responseMenuBuilder;
-        this.scraperRU = scraperRU;
         this.scraperHelper = scraperHelper;
+        this.scraperRU = scraperRU;
     }
 
     public ResponseMenu scrape() throws InterruptedException {
-        Elements mealRows = scraperRU.parseTableHtml(ruKey);
+        MenuResult menuResult = scraperRU.parseTableHtml(ruKey);
 
-        if (mealRows == null) {
+        if (menuResult == null) {
             throw new RuMenuNotFound("Menu not found with this date " + LocalDateTime.now());
         }
 
@@ -45,8 +46,17 @@ public class ScrapService implements IScrapService {
         List<MealOption> mealOptions = new ArrayList<>();
         List<String> served = new ArrayList<>();
         String mealPeriodTitle = null;
+        String imgMenu = null;
 
-        System.out.println("Meals found " + mealRows);
+        if (menuResult.isImage()) {
+            Element imgElement = menuResult.getImageElement();
+            imgMenu = imgElement.attr("src");
+            System.out.println("Menu is an image. URL: " + imgElement.attr("src"));
+            return responseMenuBuilder.createResponseMenuWithImg(imgMenu);
+        }
+
+        Elements mealRows = menuResult.getTableRows();
+        System.out.println("Meals found: " + mealRows);
 
         for (Element element : mealRows) {
             Element tdElement = element.select("td").first();
@@ -65,4 +75,5 @@ public class ScrapService implements IScrapService {
 
         scraperRU.updateMeals(meals, mealOptions, mealPeriodTitle);
         return responseMenuBuilder.createResponseMenu(meals, served);
-    }}
+    }
+}

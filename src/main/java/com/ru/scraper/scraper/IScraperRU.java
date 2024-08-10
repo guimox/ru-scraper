@@ -1,6 +1,7 @@
 package com.ru.scraper.scraper;
 
 import com.ru.scraper.data.meal.MealOption;
+import com.ru.scraper.exception.MenuResult;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -11,7 +12,7 @@ public interface IScraperRU {
 
     MealOption createMealOption(String contentPart, ScraperRU scraperRU);
 
-    Elements parseTableHtml(String ruCode) throws InterruptedException;
+    MenuResult parseTableHtml(String ruCode) throws InterruptedException;
 
     String extractTextFromHtml(String htmlContent);
 

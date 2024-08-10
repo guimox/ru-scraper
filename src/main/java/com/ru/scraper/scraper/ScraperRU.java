@@ -1,6 +1,7 @@
 package com.ru.scraper.scraper;
 
 import com.ru.scraper.data.meal.MealOption;
+import com.ru.scraper.exception.MenuResult;
 import com.ru.scraper.helper.ScraperHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,46 +20,58 @@ import java.util.Map;
 @Component
 public class ScraperRU implements IScraperRU {
 
+    private static final int MAX_RETRIES = 3;
+    private static final int TIMEOUT = 30000; // 30 seconds
+    private static final int RETRY_DELAY = 1000; // 1 second
+    private final ScraperHelper scraperHelper;
     @Value("${RU_URL}")
     private String ruUrl;
-    private final ScraperHelper scraperHelper;
 
     public ScraperRU(ScraperHelper scraperHelper) {
         this.scraperHelper = scraperHelper;
     }
 
-    private Document connectScraper(String webURL) throws InterruptedException {
-        int retryCount = 3;
-        int timeout = 30000; // 30 seconds
 
-        while (retryCount > 0) {
+    private Document connectScraper(String webURL) throws InterruptedException {
+        int attempt = 0;
+
+        while (attempt < MAX_RETRIES) {
             try {
-                System.out.println("Trying to connect to " + webURL + " retry number " + retryCount);
-                return Jsoup.connect(webURL)
-                        .timeout(timeout)
-                        .get();
+                attempt++;
+                System.out.println("Trying to connect to " + webURL + " (attempt " + attempt + ")");
+                return Jsoup.connect(webURL).timeout(TIMEOUT).get();
             } catch (IOException e) {
-                System.out.println("Error when connecting " + e);
-                retryCount--;
-                if (retryCount > 0) {
-                    Thread.sleep(1000); // 1 second delay
-                } else {
-                    throw new RuntimeException("Failed to retrieve content from " + webURL, e);
+                System.out.println("Failed to connect to " + webURL + " on attempt " + attempt + ": " + e.getMessage());
+
+                if (attempt >= MAX_RETRIES) {
+                    throw new RuntimeException("Failed to retrieve content from " + webURL + " after " + MAX_RETRIES + " attempts", e);
                 }
+
+                Thread.sleep(RETRY_DELAY); // Delay before retrying
             }
         }
 
-        return null;
+        throw new RuntimeException("Unexpected error occurred while trying to retrieve content from " + webURL);
     }
 
     @Override
-    public Elements parseTableHtml(String ruCode) throws InterruptedException {
+    public MenuResult parseTableHtml(String ruCode) throws InterruptedException {
         Document htmlDocument = this.connectScraper(ruUrl);
         String localDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM"));
         System.out.println("Trying to get a menu for the day " + localDate);
         Element titleContainingDate = htmlDocument.selectFirst("p:contains(" + localDate + ")");
+
         Element menuFromWeekday = titleContainingDate.nextElementSibling();
-        return menuFromWeekday.select("table tbody tr");
+
+        System.out.println("Menu from weekday: " + menuFromWeekday);
+
+        Element imgElement = menuFromWeekday.selectFirst("img");
+        if (imgElement != null) {
+            return new MenuResult(imgElement);
+        }
+
+        Elements tableRows = menuFromWeekday.select("table tbody tr");
+        return new MenuResult(tableRows);
     }
 
     @Override
