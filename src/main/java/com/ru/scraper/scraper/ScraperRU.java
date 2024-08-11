@@ -30,7 +30,7 @@ public class ScraperRU implements IScraperRU {
 
     public ScraperRU(ScraperHelper scraperHelper,
                      @Value("${RU_URL}") String ruUrl,
-                     @Value("#{T(java.time.LocalDate).now()}") LocalDate currentDate) {
+                     @Value("#{T(java.time.LocalDate).now().plusDays(1)}") LocalDate currentDate) {
         this.scraperHelper = scraperHelper;
         this.ruUrl = ruUrl;
         this.currentDate = currentDate;
@@ -70,13 +70,17 @@ public class ScraperRU implements IScraperRU {
         Element menuFromWeekday = titleContainingDate.nextElementSibling();
         System.out.println("Menu from weekday: " + menuFromWeekday);
 
-        Element imgElement = menuFromWeekday.selectFirst("img");
-        if (imgElement != null) {
-            return new MenuResult(imgElement);
+        if (menuFromWeekday.selectFirst("figure.wp-block-image") != null) {
+            Element imgElement = menuFromWeekday.selectFirst("img");
+            if (imgElement != null) {
+                return new MenuResult(imgElement);
+            }
+        } else if (menuFromWeekday.selectFirst("figure.wp-block-table") != null) {
+            Elements tableRows = menuFromWeekday.select("table tbody tr");
+            return new MenuResult(tableRows);
         }
 
-        Elements tableRows = menuFromWeekday.select("table tbody tr");
-        return new MenuResult(tableRows);
+        throw new RuntimeException("No menu found for the specified date.");
     }
 
     @Override
