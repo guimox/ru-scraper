@@ -2,7 +2,7 @@ package com.ru.scraper.service;
 
 import com.ru.scraper.data.meal.MealOption;
 import com.ru.scraper.data.response.ResponseMenu;
-import com.ru.scraper.exception.MenuResult;
+import com.ru.scraper.data.response.MenuResult;
 import com.ru.scraper.exception.types.RuMenuNotFound;
 import com.ru.scraper.factory.ResponseMenuBuilder;
 import com.ru.scraper.helper.ScraperHelper;

@@ -1,7 +1,7 @@
 package com.ru.scraper.scraper;
 
 import com.ru.scraper.data.meal.MealOption;
-import com.ru.scraper.exception.MenuResult;
+import com.ru.scraper.data.response.MenuResult;
 import com.ru.scraper.helper.ScraperHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -23,16 +23,20 @@ public class ScraperRU implements IScraperRU {
     private static final int MAX_RETRIES = 3;
     private static final int TIMEOUT = 30000; // 30 seconds
     private static final int RETRY_DELAY = 1000; // 1 second
-    private final ScraperHelper scraperHelper;
-    @Value("${RU_URL}")
-    private String ruUrl;
 
-    public ScraperRU(ScraperHelper scraperHelper) {
+    private final ScraperHelper scraperHelper;
+    private final LocalDate currentDate;
+    private final String ruUrl;
+
+    public ScraperRU(ScraperHelper scraperHelper,
+                     @Value("${RU_URL}") String ruUrl,
+                     @Value("#{T(java.time.LocalDate).now()}") LocalDate currentDate) {
         this.scraperHelper = scraperHelper;
+        this.ruUrl = ruUrl;
+        this.currentDate = currentDate;
     }
 
-
-    private Document connectScraper(String webURL) throws InterruptedException {
+    public Document connectScraper(String webURL) throws InterruptedException {
         int attempt = 0;
 
         while (attempt < MAX_RETRIES) {
@@ -47,7 +51,7 @@ public class ScraperRU implements IScraperRU {
                     throw new RuntimeException("Failed to retrieve content from " + webURL + " after " + MAX_RETRIES + " attempts", e);
                 }
 
-                Thread.sleep(RETRY_DELAY); // Delay before retrying
+                Thread.sleep(RETRY_DELAY);
             }
         }
 
@@ -57,12 +61,13 @@ public class ScraperRU implements IScraperRU {
     @Override
     public MenuResult parseTableHtml(String ruCode) throws InterruptedException {
         Document htmlDocument = this.connectScraper(ruUrl);
-        String localDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM"));
-        System.out.println("Trying to get a menu for the day " + localDate);
-        Element titleContainingDate = htmlDocument.selectFirst("p:contains(" + localDate + ")");
+
+        String formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd/MM"));
+        System.out.println("Trying to get a menu for the day " + formattedDate);
+
+        Element titleContainingDate = htmlDocument.selectFirst("p:contains(" + formattedDate + ")");
 
         Element menuFromWeekday = titleContainingDate.nextElementSibling();
-
         System.out.println("Menu from weekday: " + menuFromWeekday);
 
         Element imgElement = menuFromWeekday.selectFirst("img");
@@ -122,5 +127,4 @@ public class ScraperRU implements IScraperRU {
 
         return null;
     }
-
 }

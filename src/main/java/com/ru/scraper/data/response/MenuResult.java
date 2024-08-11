@@ -1,4 +1,4 @@
-package com.ru.scraper.exception;
+package com.ru.scraper.data.response;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

@@ -1,9 +1,8 @@
 package com.ru.scraper.scraper;
 
 import com.ru.scraper.data.meal.MealOption;
-import com.ru.scraper.exception.MenuResult;
+import com.ru.scraper.data.response.MenuResult;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.List;
 import java.util.Map;

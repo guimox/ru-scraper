@@ -19,9 +19,9 @@ public class ScraperHelper implements IScraperHelper {
         if (lastIndexOfSlash != -1) {
             String extractedPart = url.substring(lastIndexOfSlash + 1);
             int indexOfDot = extractedPart.lastIndexOf('.');
-            if (indexOfDot != -1) return extractedPart.substring(0, indexOfDot);
+            if (indexOfDot != -1)
+                return extractedPart.substring(0, indexOfDot);
         }
         return null;
     }
-
 }
