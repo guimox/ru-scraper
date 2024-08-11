@@ -30,7 +30,7 @@ public class ScraperRU implements IScraperRU {
 
     public ScraperRU(ScraperHelper scraperHelper,
                      @Value("${RU_URL}") String ruUrl,
-                     @Value("#{T(java.time.LocalDate).now().plusDays(1)}") LocalDate currentDate) {
+                     @Value("#{T(java.time.LocalDate).now()}") LocalDate currentDate) {
         this.scraperHelper = scraperHelper;
         this.ruUrl = ruUrl;
         this.currentDate = currentDate;
