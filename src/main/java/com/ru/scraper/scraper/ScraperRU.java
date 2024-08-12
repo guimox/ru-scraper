@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,20 +18,16 @@ import java.util.Map;
 @Component
 public class ScraperRU implements IScraperRU {
 
-    private static final int MAX_RETRIES = 3;
-    private static final int TIMEOUT = 30000; // 30 seconds
+    private static final int TIMEOUT_CONNECTION = 10000; // 10 seconds
     private static final int RETRY_DELAY = 1000; // 1 second
+    private static final int MAX_RETRIES = 3;
 
     private final ScraperHelper scraperHelper;
-    private final LocalDate currentDate;
     private final String ruUrl;
 
-    public ScraperRU(ScraperHelper scraperHelper,
-                     @Value("${RU_URL}") String ruUrl,
-                     @Value("#{T(java.time.LocalDate).now()}") LocalDate currentDate) {
+    public ScraperRU(ScraperHelper scraperHelper, @Value("${RU_URL}") String ruUrl) {
         this.scraperHelper = scraperHelper;
         this.ruUrl = ruUrl;
-        this.currentDate = currentDate;
     }
 
     public Document connectScraper(String webURL) throws InterruptedException {
@@ -43,7 +37,7 @@ public class ScraperRU implements IScraperRU {
             try {
                 attempt++;
                 System.out.println("Trying to connect to " + webURL + " (attempt " + attempt + ")");
-                return Jsoup.connect(webURL).timeout(TIMEOUT).get();
+                return Jsoup.connect(webURL).timeout(TIMEOUT_CONNECTION).get();
             } catch (IOException e) {
                 System.out.println("Failed to connect to " + webURL + " on attempt " + attempt + ": " + e.getMessage());
 
@@ -59,23 +53,26 @@ public class ScraperRU implements IScraperRU {
     }
 
     @Override
-    public MenuResult parseTableHtml(String ruCode) throws InterruptedException {
-        Document htmlDocument = this.connectScraper(ruUrl);
+    public MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException {
 
-        String formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd/MM"));
         System.out.println("Trying to get a menu for the day " + formattedDate);
-
         Element titleContainingDate = htmlDocument.selectFirst("p:contains(" + formattedDate + ")");
+
+        if (titleContainingDate == null) {
+            throw new RuntimeException("No header found");
+        }
 
         Element menuFromWeekday = titleContainingDate.nextElementSibling();
         System.out.println("Menu from weekday: " + menuFromWeekday);
 
         if (menuFromWeekday.selectFirst("figure.wp-block-image") != null) {
-            Element imgElement = menuFromWeekday.selectFirst("img");
-            if (imgElement != null) {
-                return new MenuResult(imgElement);
+            Element imgElementMenu = menuFromWeekday.selectFirst("img");
+            if (imgElementMenu != null) {
+                return new MenuResult(imgElementMenu);
             }
-        } else if (menuFromWeekday.selectFirst("figure.wp-block-table") != null) {
+        }
+
+        if (menuFromWeekday.selectFirst("figure.wp-block-table") != null) {
             Elements tableRows = menuFromWeekday.select("table tbody tr");
             return new MenuResult(tableRows);
         }

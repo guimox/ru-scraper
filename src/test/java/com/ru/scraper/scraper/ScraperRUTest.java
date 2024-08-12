@@ -45,7 +45,7 @@ class ScraperRUTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        scraperRU = new ScraperRU(scraperHelper, "https://gxlpes.github.io/ru-scraper/src/main/resources/website/Restaurante%20Universit%C3%A1rio.html", LocalDate.of(2024, 8, 8));
+//        scraperRU = new ScraperRU(scraperHelper, "https://gxlpes.github.io/ru-scraper/src/main/resources/website/Restaurante%20Universit%C3%A1rio.html", LocalDate.of(2024, 8, 8));
     }
 
     @Test

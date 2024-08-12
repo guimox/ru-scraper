@@ -1,12 +1,14 @@
 package com.ru.scraper.service;
 
 import com.ru.scraper.data.meal.MealOption;
-import com.ru.scraper.data.response.ResponseMenu;
 import com.ru.scraper.data.response.MenuResult;
+import com.ru.scraper.data.response.ResponseMenu;
 import com.ru.scraper.exception.types.RuMenuNotFound;
 import com.ru.scraper.factory.ResponseMenuBuilder;
 import com.ru.scraper.helper.ScraperHelper;
+import com.ru.scraper.helper.Utils;
 import com.ru.scraper.scraper.ScraperRU;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,20 +26,27 @@ public class ScrapService implements IScrapService {
     private final ResponseMenuBuilder responseMenuBuilder;
     private final ScraperHelper scraperHelper;
     private final ScraperRU scraperRU;
+    private final Utils utils;
+
     @Value("${RU_CODE}")
     private String ruKey;
+    @Value("${RU_URL}")
+    private String ruUrl;
 
-    public ScrapService(ResponseMenuBuilder responseMenuBuilder, ScraperRU scraperRU, ScraperHelper scraperHelper) {
+    public ScrapService(ResponseMenuBuilder responseMenuBuilder, ScraperRU scraperRU, ScraperHelper scraperHelper, Utils utils) {
         this.responseMenuBuilder = responseMenuBuilder;
         this.scraperHelper = scraperHelper;
         this.scraperRU = scraperRU;
+        this.utils = utils;
     }
 
     public ResponseMenu scrape() throws InterruptedException {
-        MenuResult menuResult = scraperRU.parseTableHtml(ruKey);
+        Document documentFromUrl = scraperRU.connectScraper(ruUrl);
+        String formattedDate = utils.getFormattedDate(LocalDateTime.now());
+        MenuResult menuResult = scraperRU.parseTableHtml(documentFromUrl, formattedDate);
 
         if (menuResult == null) {
-            throw new RuMenuNotFound("Menu not found with this date " + LocalDateTime.now());
+            throw new RuMenuNotFound("Menu not found with this date " + formattedDate);
         }
 
         System.out.println("Menu parsed for the restaurant " + ruKey);
