@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +35,11 @@ public class ScraperRU implements IScraperRU {
 
     public boolean isInternetAvailable() {
         try {
-            InetAddress address = InetAddress.getByName("8.8.8.8");
-            return address.isReachable(5000); // timeout in milliseconds
+            final URL url = new URL("http://www.google.com");
+            final URLConnection conn = url.openConnection();
+            conn.connect();
+            conn.getInputStream().close();
+            return true;
         } catch (IOException e) {
             return false;
         }
