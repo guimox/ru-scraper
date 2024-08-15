@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +19,9 @@ import java.util.Map;
 @Component
 public class ScraperRU implements IScraperRU {
 
-    private static final int TIMEOUT_CONNECTION = 10000; // 10 seconds
-    private static final int RETRY_DELAY = 1000; // 1 second
-    private static final int MAX_RETRIES = 3;
+    private static final int TIMEOUT_CONNECTION = 8000; // 10 seconds
+    private static final int RETRY_DELAY = 500; // 1/2 second
+    private static final int MAX_RETRIES = 4;
 
     private final ScraperHelper scraperHelper;
     private final String ruUrl;
@@ -30,7 +31,20 @@ public class ScraperRU implements IScraperRU {
         this.ruUrl = ruUrl;
     }
 
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress address = InetAddress.getByName("8.8.8.8");
+            return address.isReachable(5000); // timeout in milliseconds
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     public Document connectScraper(String webURL) throws InterruptedException {
+        if (!isInternetAvailable()) {
+            throw new RuntimeException("No internet connection available");
+        }
+
         int attempt = 0;
 
         while (attempt < MAX_RETRIES) {
