@@ -21,8 +21,8 @@ import java.util.Map;
 @Component
 public class ScraperRU implements IScraperRU {
 
-    private static final int TIMEOUT_CONNECTION = 8000; // 10 seconds
-    private static final int RETRY_DELAY = 500; // 1/2 second
+    private static final int TIMEOUT_CONNECTION = 12000; // 12 seconds
+    private static final int RETRY_DELAY = 1000; // 1 second
     private static final int MAX_RETRIES = 4;
 
     private final ScraperHelper scraperHelper;
@@ -51,6 +51,8 @@ public class ScraperRU implements IScraperRU {
         }
 
         int attempt = 0;
+
+        System.out.println("Internet is available");
 
         while (attempt < MAX_RETRIES) {
             try {
