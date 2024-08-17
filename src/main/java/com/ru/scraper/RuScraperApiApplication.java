@@ -1,5 +1,7 @@
 package com.ru.scraper;
 
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.ScheduledEvent;
 import com.ru.scraper.service.ScrapService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,10 +22,11 @@ public class RuScraperApiApplication {
     }
 
     @Bean
-    public Function<?, ?> scraperMenu() {
+    public Function<ScheduledEvent, ?> scraperMenu() {
         return (input) -> {
             try {
                 System.out.println("INPUT RECEIVED: " + input.toString());
+                System.out.println("INPUT RECEIVED: " + input.getTime().toString());
                 return scrapService.scrape();
             } catch (Exception e) {
                 e.printStackTrace();
