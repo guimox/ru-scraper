@@ -3,6 +3,7 @@ package com.ru.scraper.scraper;
 import com.ru.scraper.data.meal.MealOption;
 import com.ru.scraper.data.response.MenuResult;
 import com.ru.scraper.helper.ScraperHelper;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -58,22 +59,39 @@ public class ScraperRU implements IScraperRU {
             try {
                 attempt++;
                 System.out.println("Trying to connect to " + webURL + " (attempt " + attempt + ")");
-                return Jsoup.connect(webURL).timeout(TIMEOUT_CONNECTION).get();
+
+                Connection.Response response = Jsoup.connect(webURL)
+                        .timeout(TIMEOUT_CONNECTION)
+                        .execute();
+
+                System.out.println("HTTP Status Code: " + response.statusCode());
+                System.out.println("HTTP Status Message: " + response.statusMessage());
+                System.out.println("Response Headers: " + response.headers());
+
+                if (response.statusCode() == 200) {
+                    return response.parse();
+                } else {
+                    System.out.println("Unexpected HTTP status code: " + response.statusCode());
+                    throw new RuntimeException("Failed to retrieve content from " + webURL + " due to unexpected HTTP " +
+                            "status code: " + response.statusCode());
+                }
             } catch (IOException e) {
                 System.out.println("Failed to connect to " + webURL + " on attempt " + attempt + ": " + e.getMessage());
 
                 if (attempt >= MAX_RETRIES) {
-                    throw new RuntimeException("Failed to retrieve content from " + webURL + " after " + MAX_RETRIES + " attempts", e);
+                    throw new RuntimeException("Failed to retrieve content from " + webURL + " after " + MAX_RETRIES + " " +
+                            "attempts", e);
                 }
 
                 Thread.sleep(RETRY_DELAY);
             }
         }
 
-        throw new RuntimeException("Unexpected error occurred while trying to retrieve content from " + webURL);
+        throw new RuntimeException("Failed to retrieve content from " + webURL + " after " + MAX_RETRIES + " attempts");
     }
 
-    @Override
+
+@Override
     public MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException {
 
         System.out.println("Trying to get a menu for the day " + formattedDate);
