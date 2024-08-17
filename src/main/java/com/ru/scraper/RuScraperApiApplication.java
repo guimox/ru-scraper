@@ -5,10 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @SpringBootApplication
 public class RuScraperApiApplication {
@@ -23,7 +20,7 @@ public class RuScraperApiApplication {
     }
 
     @Bean
-    public Function<Object, Object> scraperMenu() {
+    public Function<?, ?> scraperMenu() {
         return (input) -> {
             try {
                 System.out.println("INPUT RECEIVED: " + input);
