@@ -23,7 +23,7 @@ public class RuScraperApiApplication {
     public Function<?, ?> scraperMenu() {
         return (input) -> {
             try {
-                System.out.println("INPUT RECEIVED: " + input);
+                System.out.println("INPUT RECEIVED: " + input.toString());
                 return scrapService.scrape();
             } catch (Exception e) {
                 e.printStackTrace();
