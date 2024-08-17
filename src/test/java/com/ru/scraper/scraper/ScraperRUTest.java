@@ -57,7 +57,6 @@ class ScraperRUTest {
         scraperHelper = mock(ScraperHelper.class);
         String testUrl = "https://gxlpes.github.io/ru-scraper/src/main/resources/website/ru-website-1208-0908.html";
         document = Jsoup.connect(testUrl).execute().parse();
-        scraperRU = new ScraperRU(scraperHelper, testUrl);
     }
 
     @Test

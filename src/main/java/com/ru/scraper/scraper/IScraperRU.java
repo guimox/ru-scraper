@@ -11,16 +11,14 @@ import java.util.Map;
 
 public interface IScraperRU {
 
-    MealOption createMealOption(String contentPart, ScraperRU scraperRU);
+    MealOption createMealOption(String contentPart);
 
     MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException;
 
     String extractTextFromHtml(String htmlContent);
 
-    String extractImageName(Element imgElement, ScraperRU scraperRU);
+    String extractImageName(Element imgElement);
 
-    void updateMeals(Map<String, List<MealOption>> meals, List<MealOption> mealOptions, String mealPeriodTitle);
-
-    void processContentFromRow(String htmlContent, List<MealOption> mealOptions, ScraperRU scraperRU);
+    void processContentFromRow(String htmlContent, List<MealOption> mealOptions);
 
 }

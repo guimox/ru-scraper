@@ -42,7 +42,7 @@ public class ScrapService implements IScrapService {
 
     public ResponseMenu scrape() throws InterruptedException {
         Document documentFromUrl = scraperRU.connectScraper(ruUrl);
-        String formattedDate = utils.getFormattedDate(LocalDateTime.now().minusDays(1));
+        String formattedDate = utils.getFormattedDate(LocalDateTime.now().minusDays(2));
         MenuResult menuResult = scraperRU.parseTableHtml(documentFromUrl, formattedDate);
 
         if (menuResult == null) {
@@ -72,17 +72,17 @@ public class ScrapService implements IScrapService {
             String mealTitle = scraperHelper.translateMeal(tdElement.text());
 
             if (mealTitle != null) {
-                scraperRU.updateMeals(meals, mealOptions, mealPeriodTitle);
+                utils.updateMeals(meals, mealOptions, mealPeriodTitle);
                 mealOptions = new ArrayList<>();
                 mealPeriodTitle = mealTitle;
                 served.add(mealTitle);
                 continue;
             }
 
-            scraperRU.processContentFromRow(tdElement.html(), mealOptions, scraperRU);
+            scraperRU.processContentFromRow(tdElement.html(), mealOptions);
         }
 
-        scraperRU.updateMeals(meals, mealOptions, mealPeriodTitle);
+        utils.updateMeals(meals, mealOptions, mealPeriodTitle);
         return responseMenuBuilder.createResponseMenu(meals, served);
     }
 }
