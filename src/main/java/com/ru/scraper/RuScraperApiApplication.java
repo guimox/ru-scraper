@@ -1,6 +1,5 @@
 package com.ru.scraper;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent;
 import com.ru.scraper.service.ScrapService;
 import org.springframework.boot.SpringApplication;
