@@ -35,6 +35,15 @@ class ScraperRUTest {
     private Element element;
 
     @Mock
+    private Document mockDocument;
+
+    @Mock
+    private Element mockDateElement;
+
+    @Mock
+    private Element mockMenuElement;
+
+    @Mock
     private Connection connection;
 
     @Mock
@@ -43,19 +52,89 @@ class ScraperRUTest {
     private ScraperRU scraperRU;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
-//        scraperRU = new ScraperRU(scraperHelper, "https://gxlpes.github.io/ru-scraper/src/main/resources/website/Restaurante%20Universit%C3%A1rio.html", LocalDate.of(2024, 8, 8));
+        scraperHelper = mock(ScraperHelper.class);
+        String testUrl = "https://gxlpes.github.io/ru-scraper/src/main/resources/website/ru-website-1208-0908.html";
+        document = Jsoup.connect(testUrl).execute().parse();
+        scraperRU = new ScraperRU(scraperHelper, testUrl);
     }
 
     @Test
     void testConnectScraper_SuccessfulConnection() throws Exception {
-        String webURL = "https://gxlpes.github.io/ru-scraper/src/main/resources/website/Restaurante%20Universit%C3%A1rio.html";
-        System.out.println(webURL + " ############");
+        String webURL = "https://gxlpes.github.io/ru-scraper/src/main/resources/website/ru-website-1208-0908.html";
         Document result = scraperRU.connectScraper(webURL);
-
         assertNotNull(result, "The document should not be null when the connection is successful.");
-        assertEquals(document, result, "The returned document should be the same as the mocked document.");
     }
 
+    @Test
+    void testConnectScraper_UnsuccesfulConnection() throws Exception {
+        String webURL = "https://gxlpes.github.io/ru-scraper/src/main/resources/website/ru-website-error.html";
+        String expectedMessage = "Failed to retrieve content from the website after 4 attempts";
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            scraperRU.connectScraper(webURL);
+        });
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void testParseTableHtml_WithImageMenu() throws InterruptedException {
+        String formattedDate = "12/08";
+        Element mockImgElement = mock(Element.class);
+
+        when(mockDocument.selectFirst("p:contains(" + formattedDate + ")")).thenReturn(mockDateElement);
+        when(mockDateElement.nextElementSibling()).thenReturn(mockMenuElement);
+        when(mockMenuElement.selectFirst("figure.wp-block-image")).thenReturn(mock(Element.class));
+        when(mockMenuElement.selectFirst("img")).thenReturn(mockImgElement);
+
+        MenuResult result = scraperRU.parseTableHtml(mockDocument, formattedDate);
+
+        assertNotNull(result);
+        assertNull(result.getTableRows());
+        assertEquals(mockImgElement, result.getImageElement());
+    }
+
+    @Test
+    void testParseTableHtml_WithTableMenu() throws InterruptedException {
+        String formattedDate = "12/08";
+        Elements mockTableRows = mock(Elements.class);
+
+        when(mockDocument.selectFirst("p:contains(" + formattedDate + ")")).thenReturn(mockDateElement);
+        when(mockDateElement.nextElementSibling()).thenReturn(mockMenuElement);
+        when(mockMenuElement.selectFirst("figure.wp-block-image")).thenReturn(null);
+        when(mockMenuElement.selectFirst("figure.wp-block-table")).thenReturn(mock(Element.class));
+        when(mockMenuElement.select("table tbody tr")).thenReturn(mockTableRows);
+
+        MenuResult result = scraperRU.parseTableHtml(mockDocument, formattedDate);
+
+        assertNotNull(result);
+        assertNull(result.getImageElement());
+        assertEquals(mockTableRows, result.getTableRows());
+    }
+
+    @Test
+    void testParseTableHtml_NoHeaderFound() {
+        String formattedDate = "12/08";
+
+        when(mockDocument.selectFirst("p:contains(" + formattedDate + ")")).thenReturn(null);
+
+        assertThrows(RuntimeException.class, () -> {
+            scraperRU.parseTableHtml(mockDocument, formattedDate);
+        }, "Should throw RuntimeException when no header is found");
+    }
+
+    @Test
+    void testParseTableHtml_NoMenuFound() {
+        String formattedDate = "12/08";
+
+        when(mockDocument.selectFirst("p:contains(" + formattedDate + ")")).thenReturn(mockDateElement);
+        when(mockDateElement.nextElementSibling()).thenReturn(mockMenuElement);
+        when(mockMenuElement.selectFirst("figure.wp-block-image")).thenReturn(null);
+        when(mockMenuElement.selectFirst("figure.wp-block-table")).thenReturn(null);
+
+        assertThrows(RuntimeException.class, () -> {
+            scraperRU.parseTableHtml(mockDocument, formattedDate);
+        }, "Should throw RuntimeException when no menu is found");
+    }
 }
