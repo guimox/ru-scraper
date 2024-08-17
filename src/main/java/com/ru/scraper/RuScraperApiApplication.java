@@ -23,7 +23,7 @@ public class RuScraperApiApplication {
     }
 
     @Bean
-    public Function<Map<String, Object>, Object> scraperMenu() {
+    public Function<Object, Object> scraperMenu() {
         return (input) -> {
             try {
                 System.out.println("INPUT RECEIVED: " + input);
