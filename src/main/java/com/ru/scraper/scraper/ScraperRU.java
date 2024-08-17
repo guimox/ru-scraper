@@ -3,6 +3,7 @@ package com.ru.scraper.scraper;
 import com.ru.scraper.data.meal.MealOption;
 import com.ru.scraper.data.response.MenuResult;
 import com.ru.scraper.helper.ScraperHelper;
+import com.ru.scraper.helper.Utils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,29 +26,18 @@ public class ScraperRU implements IScraperRU {
     private static final int TIMEOUT_CONNECTION = 12000; // 12 seconds
     private static final int RETRY_DELAY = 1000; // 1 second
     private static final int MAX_RETRIES = 4;
-
+    private final Utils utils;
     private final ScraperHelper scraperHelper;
     private final String ruUrl;
 
-    public ScraperRU(ScraperHelper scraperHelper, @Value("${RU_URL}") String ruUrl) {
+    public ScraperRU(Utils utils, ScraperHelper scraperHelper, @Value("${RU_URL}") String ruUrl) {
+        this.utils = utils;
         this.scraperHelper = scraperHelper;
         this.ruUrl = ruUrl;
     }
 
-    public boolean isInternetAvailable() {
-        try {
-            final URL url = new URL("http://www.google.com");
-            final URLConnection conn = url.openConnection();
-            conn.connect();
-            conn.getInputStream().close();
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
     public Document connectScraper(String webURL) throws InterruptedException {
-        if (!isInternetAvailable()) {
+        if (!utils.isInternetAvailable()) {
             throw new RuntimeException("No internet connection available");
         }
 
@@ -60,9 +50,7 @@ public class ScraperRU implements IScraperRU {
                 attempt++;
                 System.out.println("Trying to connect to " + webURL + " (attempt " + attempt + ")");
 
-                Connection.Response response = Jsoup.connect(webURL)
-                        .timeout(TIMEOUT_CONNECTION)
-                        .execute();
+                Connection.Response response = Jsoup.connect(webURL).timeout(TIMEOUT_CONNECTION).execute();
 
                 System.out.println("HTTP Status Code: " + response.statusCode());
                 System.out.println("HTTP Status Message: " + response.statusMessage());
@@ -72,33 +60,31 @@ public class ScraperRU implements IScraperRU {
                     return response.parse();
                 } else {
                     System.out.println("Unexpected HTTP status code: " + response.statusCode());
-                    throw new RuntimeException("Failed to retrieve content from " + webURL + " due to unexpected HTTP " +
-                            "status code: " + response.statusCode());
+                    throw new RuntimeException("Failed to retrieve content from the website due to unexpected HTTP " + "status code: " + response.statusCode());
                 }
             } catch (IOException e) {
                 System.out.println("Failed to connect to " + webURL + " on attempt " + attempt + ": " + e.getMessage());
 
                 if (attempt >= MAX_RETRIES) {
-                    throw new RuntimeException("Failed to retrieve content from " + webURL + " after " + MAX_RETRIES + " " +
-                            "attempts", e);
+                    throw new RuntimeException("Failed to retrieve content from the website after " + MAX_RETRIES + " attempts");
                 }
 
                 Thread.sleep(RETRY_DELAY);
             }
         }
 
-        throw new RuntimeException("Failed to retrieve content from " + webURL + " after " + MAX_RETRIES + " attempts");
+        throw new RuntimeException("Failed to retrieve content from the website after " + MAX_RETRIES + " attempts");
     }
 
 
-@Override
+    @Override
     public MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException {
 
         System.out.println("Trying to get a menu for the day " + formattedDate);
         Element titleContainingDate = htmlDocument.selectFirst("p:contains(" + formattedDate + ")");
 
         if (titleContainingDate == null) {
-            throw new RuntimeException("No header found");
+            throw new RuntimeException("No title found with the given date");
         }
 
         Element menuFromWeekday = titleContainingDate.nextElementSibling();
@@ -125,23 +111,16 @@ public class ScraperRU implements IScraperRU {
     }
 
     @Override
-    public String extractImageName(Element imgElement, ScraperRU scraperRU) {
+    public String extractImageName(Element imgElement) {
         String src = imgElement.attr("src");
         return scraperHelper.extractFileNameWithoutExtension(src);
     }
 
     @Override
-    public void updateMeals(Map<String, List<MealOption>> meals, List<MealOption> mealOptions, String mealPeriodTitle) {
-        if (mealPeriodTitle != null && !mealOptions.isEmpty()) {
-            meals.put(mealPeriodTitle, new ArrayList<>(mealOptions));
-        }
-    }
-
-    @Override
-    public void processContentFromRow(String htmlContent, List<MealOption> mealOptions, ScraperRU scraperRU) {
+    public void processContentFromRow(String htmlContent, List<MealOption> mealOptions) {
         String[] contentFromRow = htmlContent.split("<br>");
         for (String contentPart : contentFromRow) {
-            MealOption mealOption = createMealOption(contentPart, scraperRU);
+            MealOption mealOption = this.createMealOption(contentPart);
             if (mealOption != null) {
                 mealOptions.add(mealOption);
             }
@@ -149,8 +128,8 @@ public class ScraperRU implements IScraperRU {
     }
 
     @Override
-    public MealOption createMealOption(String contentPart, ScraperRU scraperRU) {
-        String text = scraperRU.extractTextFromHtml(contentPart);
+    public MealOption createMealOption(String contentPart) {
+        String text = this.extractTextFromHtml(contentPart);
 
         if (!text.isEmpty()) {
             MealOption mealOption = new MealOption();
@@ -158,7 +137,7 @@ public class ScraperRU implements IScraperRU {
 
             Elements imgElements = Jsoup.parse(contentPart).select("img");
             for (Element imgElement : imgElements) {
-                String imageName = scraperRU.extractImageName(imgElement, scraperRU);
+                String imageName = this.extractImageName(imgElement);
                 mealOption.addIcon(imageName);
             }
 
