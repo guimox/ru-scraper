@@ -26,7 +26,7 @@ public class RuScraperApiApplication {
     public Function<Map<String, Object>, Object> scraperMenu() {
         return (input) -> {
             try {
-                System.out.println(input);
+                System.out.println("INPUT RECEIVED: " + input);
                 return scrapService.scrape();
             } catch (Exception e) {
                 e.printStackTrace();
