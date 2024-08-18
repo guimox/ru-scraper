@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,8 +39,10 @@ class ScraperRUTest {
         Function<ScheduledEvent, ?> function = application.scraperMenu();
         Object result = function.apply(testEvent);
 
+        LocalDateTime localDateTime = LocalDateTime.now();
+
         // Verify the interactions and the result
-        verify(scrapService, times(1)).scrape();
+        verify(scrapService, times(1)).scrape(localDateTime);
         assertNotNull(result);
     }
 }
