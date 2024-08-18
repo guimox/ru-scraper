@@ -13,12 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class ScraperRU implements IScraperRU {
@@ -84,7 +79,7 @@ public class ScraperRU implements IScraperRU {
         Element titleContainingDate = htmlDocument.selectFirst("p:contains(" + formattedDate + ")");
 
         if (titleContainingDate == null) {
-            throw new RuntimeException("No title found with the given date");
+            throw new RuntimeException("No menu found with the given date " + formattedDate);
         }
 
         Element menuFromWeekday = titleContainingDate.nextElementSibling();

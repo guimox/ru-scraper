@@ -1,12 +1,14 @@
 package com.ru.scraper.helper;
 
 import com.ru.scraper.data.meal.MealOption;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,5 +37,12 @@ public class Utils {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    public LocalDateTime convertToLocalDateTime (DateTime jodaDateTime) {
+        return LocalDateTime.ofInstant(
+                jodaDateTime.toDate().toInstant(),
+                ZoneId.systemDefault()
+        );
     }
 }

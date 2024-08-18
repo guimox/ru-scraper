@@ -10,13 +10,13 @@ import java.util.Map;
 @Component
 public class ResponseMenu {
 
-    private Map<String, List<MealOption>> meals;
-    private List<String> served;
     private ZonedDateTime date;
     private String imgMenu;
     private String ruName;
     private String ruUrl;
     private String ruCode;
+    private List<String> served;
+    private Map<String, List<MealOption>> meals;
 
     public String getImgMenu() {
         return imgMenu;
