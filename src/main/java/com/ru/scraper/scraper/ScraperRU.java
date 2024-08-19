@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 public class ScraperRU implements IScraperRU {
 
-    private static final int TIMEOUT_CONNECTION = 12000; // 12 seconds
+    private static final int TIMEOUT_CONNECTION = 35000; // 12 seconds
     private static final int RETRY_DELAY = 1000; // 1 second
     private static final int MAX_RETRIES = 4;
     private final Utils utils;
