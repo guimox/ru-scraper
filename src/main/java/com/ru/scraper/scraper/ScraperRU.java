@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 public class ScraperRU implements IScraperRU {
 
-    private static final int TIMEOUT_CONNECTION = 35000; // 12 seconds
+    private static final int TIMEOUT_CONNECTION = 35000; // 35 seconds
     private static final int RETRY_DELAY = 1000; // 1 second
     private static final int MAX_RETRIES = 4;
     private final Utils utils;
@@ -45,7 +45,9 @@ public class ScraperRU implements IScraperRU {
                 attempt++;
                 System.out.println("Trying to connect to " + webURL + " (attempt " + attempt + ")");
 
-                Connection.Response response = Jsoup.connect(webURL).timeout(TIMEOUT_CONNECTION).execute();
+                Connection.Response response = Jsoup.connect(webURL).timeout(TIMEOUT_CONNECTION)
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+                        .execute();
 
                 System.out.println("HTTP Status Code: " + response.statusCode());
                 System.out.println("HTTP Status Message: " + response.statusMessage());
