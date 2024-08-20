@@ -26,8 +26,8 @@ public class ScraperRU implements IScraperRU {
     private final String ruUrl;
 
     public ScraperRU(Utils utils, ScraperHelper scraperHelper, @Value("${RU_URL}") String ruUrl) {
-        this.utils = utils;
         this.scraperHelper = scraperHelper;
+        this.utils = utils;
         this.ruUrl = ruUrl;
     }
 
@@ -46,7 +46,7 @@ public class ScraperRU implements IScraperRU {
                 System.out.println("Trying to connect to " + webURL + " (attempt " + attempt + ")");
 
                 Connection.Response response = Jsoup.connect(webURL).timeout(TIMEOUT_CONNECTION)
-                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+                        .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
                         .execute();
 
                 System.out.println("HTTP Status Code: " + response.statusCode());
