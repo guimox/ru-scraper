@@ -13,13 +13,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 @Component
 public class ScraperRU implements IScraperRU {
 
-    private static final int TIMEOUT_CONNECTION = 35000; // 35 seconds
-    private static final int RETRY_DELAY = 1000; // 1 second
+    private static final int TIMEOUT_CONNECTION = 40000; // 35 seconds
+    private static final int RETRY_DELAY = 2000; // 1 second
     private static final int MAX_RETRIES = 4;
     private final Utils utils;
     private final ScraperHelper scraperHelper;
@@ -60,17 +62,22 @@ public class ScraperRU implements IScraperRU {
                     throw new RuntimeException("Failed to retrieve content from the website due to unexpected HTTP " + "status code: " + response.statusCode());
                 }
             } catch (IOException e) {
-                System.out.println("Failed to connect to " + webURL + " on attempt " + attempt + ": " + e.getMessage());
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                String exceptionDetails = sw.toString();
+
+                System.out.println("Failed to connect to " + webURL + " on attempt " + attempt);
+                System.out.println("Exception Details: " + exceptionDetails);
 
                 if (attempt >= MAX_RETRIES) {
-                    throw new RuntimeException("Failed to retrieve content from the website after " + MAX_RETRIES + " attempts");
+                    throw new RuntimeException("Failed to retrieve content from the website after " + MAX_RETRIES + " attempts. Exception: " + exceptionDetails);
                 }
 
                 Thread.sleep(RETRY_DELAY);
             }
         }
 
-        throw new RuntimeException("Failed to retrieve content from the website after " + MAX_RETRIES + " attempts");
+        return null; // Return null if the loop ends without success (shouldn't happen due to exception handling)
     }
 
 
