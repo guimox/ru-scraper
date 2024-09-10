@@ -48,7 +48,6 @@ public class ScraperRU implements IScraperRU {
                 System.out.println("Trying to connect to " + webURL + " (attempt " + attempt + ")");
 
                 Connection.Response response = Jsoup.connect(webURL).timeout(TIMEOUT_CONNECTION)
-                        .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
                         .execute();
 
                 System.out.println("HTTP Status Code: " + response.statusCode());
