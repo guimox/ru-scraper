@@ -35,6 +35,8 @@ public class ScraperRU implements IScraperRU {
     }
 
     public Document connectScraper(String webURL) throws InterruptedException {
+        System.setProperty("java.net.preferIPv6Addresses", "true");
+
         if (!utils.isInternetAvailable()) {
             throw new RuntimeException("No internet connection available");
         }

@@ -31,6 +31,7 @@ public class RuScraperApplication {
         return (input) -> {
             try {
                 System.out.println("TIME TRIGGERED: " + input.getTime().toString());
+                System.setProperty("java.net.preferIPv6Addresses", "true");
                 DateTime jodaDateTime = input.getTime();
                 LocalDateTime javaLocalDateTime = utils.convertToLocalDateTime(jodaDateTime);
                 return scrapService.scrape(javaLocalDateTime);
