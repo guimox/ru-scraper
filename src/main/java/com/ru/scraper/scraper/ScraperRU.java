@@ -11,7 +11,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,6 +35,18 @@ public class ScraperRU implements IScraperRU {
     }
 
     public Document connectScraper(String webURL) throws InterruptedException {
+        if (!utils.isInternetAvailable()) {
+            throw new RuntimeException("No internet connection available");
+        }
+
+        try {
+            // Print the IP address (IPv6 if available)
+            InetAddress localHost = InetAddress.getLocalHost();
+            System.out.println("Local IP Address: " + localHost.getHostAddress());
+        } catch (UnknownHostException e) {
+            System.out.println("Unable to retrieve the local IP address");
+        }
+
         int attempt = 0;
 
         System.out.println("Internet is available");
@@ -89,8 +102,10 @@ public class ScraperRU implements IScraperRU {
             }
         }
 
-        throw new RuntimeException("Failed to connect after maximum attempts.");
+        return null; // Return null if the loop ends without success (shouldn't happen due to exception handling)
     }
+
+
 
     @Override
     public MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException {
