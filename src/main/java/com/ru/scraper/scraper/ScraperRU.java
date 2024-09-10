@@ -34,9 +34,9 @@ public class ScraperRU implements IScraperRU {
     }
 
     public Document connectScraper(String webURL) throws InterruptedException {
-        if (!utils.isInternetAvailable()) {
-            throw new RuntimeException("No internet connection available");
-        }
+//        if (!utils.isInternetAvailable()) {
+//            throw new RuntimeException("No internet connection available");
+//        }
 
         int attempt = 0;
 
