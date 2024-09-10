@@ -34,10 +34,6 @@ public class ScraperRU implements IScraperRU {
     }
 
     public Document connectScraper(String webURL) throws InterruptedException {
-//        if (!utils.isInternetAvailable()) {
-//            throw new RuntimeException("No internet connection available");
-//        }
-
         int attempt = 0;
 
         System.out.println("Internet is available");
@@ -47,7 +43,24 @@ public class ScraperRU implements IScraperRU {
                 attempt++;
                 System.out.println("Trying to connect to " + webURL + " (attempt " + attempt + ")");
 
-                Connection.Response response = Jsoup.connect(webURL).timeout(TIMEOUT_CONNECTION)
+                Connection.Response response = Jsoup.connect(webURL)
+                        .timeout(TIMEOUT_CONNECTION)
+                        .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+                        .header("Accept-Encoding", "gzip, deflate, br, zstd")
+                        .header("Accept-Language", "en-US,en;q=0.9,pt;q=0.8")
+                        .header("Cache-Control", "max-age=0")
+                        .header("Connection", "keep-alive")
+                        .header("Host", "pra.ufpr.br")
+                        .header("Referer", "https://www.google.com/")
+                        .header("Sec-CH-UA", "\"Chromium\";v=\"128\", \"Not;A=Brand\";v=\"24\", \"Google Chrome\";v=\"128\"")
+                        .header("Sec-CH-UA-Mobile", "?0")
+                        .header("Sec-CH-UA-Platform", "\"Windows\"")
+                        .header("Sec-Fetch-Dest", "document")
+                        .header("Sec-Fetch-Mode", "navigate")
+                        .header("Sec-Fetch-Site", "cross-site")
+                        .header("Sec-Fetch-User", "?1")
+                        .header("Upgrade-Insecure-Requests", "1")
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
                         .execute();
 
                 System.out.println("HTTP Status Code: " + response.statusCode());
@@ -76,9 +89,8 @@ public class ScraperRU implements IScraperRU {
             }
         }
 
-        return null; // Return null if the loop ends without success (shouldn't happen due to exception handling)
+        throw new RuntimeException("Failed to connect after maximum attempts.");
     }
-
 
     @Override
     public MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException {
