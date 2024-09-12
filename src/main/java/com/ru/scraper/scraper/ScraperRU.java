@@ -42,7 +42,6 @@ public class ScraperRU implements IScraperRU {
         }
 
         try {
-            // Print the IP address (IPv6 if available)
             InetAddress localHost = InetAddress.getLocalHost();
             System.out.println("Local IP Address: " + localHost.getHostAddress());
         } catch (UnknownHostException e) {
@@ -104,7 +103,7 @@ public class ScraperRU implements IScraperRU {
             }
         }
 
-        return null; // Return null if the loop ends without success (shouldn't happen due to exception handling)
+        return null;
     }
 
 
@@ -114,6 +113,15 @@ public class ScraperRU implements IScraperRU {
 
         System.out.println("Trying to get a menu for the day " + formattedDate);
         Element titleContainingDate = htmlDocument.selectFirst("p:contains(" + formattedDate + ")");
+
+        if (titleContainingDate == null) {
+            titleContainingDate = htmlDocument.selectFirst("figcaption:contains(" + formattedDate + ")");
+        }
+
+
+        if (titleContainingDate == null) {
+            titleContainingDate = htmlDocument.selectFirst("strong:contains(" + formattedDate + ")");
+        }
 
         if (titleContainingDate == null) {
             throw new RuntimeException("No menu found with the given date " + formattedDate);
