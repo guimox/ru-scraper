@@ -118,7 +118,6 @@ public class ScraperRU implements IScraperRU {
             titleContainingDate = htmlDocument.selectFirst("figcaption:contains(" + formattedDate + ")");
         }
 
-
         if (titleContainingDate == null) {
             titleContainingDate = htmlDocument.selectFirst("strong:contains(" + formattedDate + ")");
         }
@@ -127,21 +126,34 @@ public class ScraperRU implements IScraperRU {
             throw new RuntimeException("No menu found with the given date " + formattedDate);
         }
 
-        Element menuFromWeekday = titleContainingDate.nextElementSibling();
-        System.out.println("Menu from weekday: " + menuFromWeekday);
+        Element parentElement = titleContainingDate.parent();
 
-        if (menuFromWeekday.selectFirst("figure.wp-block-image") != null) {
-            Element imgElementMenu = menuFromWeekday.selectFirst("img");
+// Now search for the first figure that comes after the titleContainingDate
+        Element menuFigure = parentElement.nextElementSibling();
+
+        while (menuFigure != null && !menuFigure.tagName().equals("figure")) {
+            menuFigure = menuFigure.nextElementSibling();
+        }
+
+        if (menuFigure == null || !menuFigure.hasClass("wp-block-table")) {
+            throw new RuntimeException("No menu figure found after the date.");
+        }
+
+        System.out.println("Menu from weekday: " + menuFigure);
+
+// Check if it's an image menu
+        if (menuFigure.selectFirst("figure.wp-block-image") != null) {
+            Element imgElementMenu = menuFigure.selectFirst("img");
             if (imgElementMenu != null) {
                 return new MenuResult(imgElementMenu);
             }
         }
 
-        if (menuFromWeekday.selectFirst("figure.wp-block-table") != null) {
-            Elements tableRows = menuFromWeekday.select("table tbody tr");
+// If it's a table menu
+        if (menuFigure.selectFirst("figure.wp-block-table") != null) {
+            Elements tableRows = menuFigure.select("table tbody tr");
             return new MenuResult(tableRows);
         }
-
         throw new RuntimeException("No menu found for the specified date.");
     }
 
