@@ -106,8 +106,6 @@ public class ScraperRU implements IScraperRU {
         return null;
     }
 
-
-
     @Override
     public MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException {
 
@@ -126,9 +124,34 @@ public class ScraperRU implements IScraperRU {
             throw new RuntimeException("No menu found with the given date " + formattedDate);
         }
 
-        Element parentElement = titleContainingDate.parent();
+        // First approach: Try to get the menu using nextElementSibling()
+        Element menuFromWeekday = titleContainingDate.nextElementSibling();
+        System.out.println("First try - Menu from weekday: " + menuFromWeekday);
 
-// Now search for the first figure that comes after the titleContainingDate
+        if (menuFromWeekday != null) {
+            // Check if it's a valid figure
+            if (menuFromWeekday.tagName().equals("figure") && menuFromWeekday.hasClass("wp-block-table")) {
+                System.out.println("Menu found via nextElementSibling approach.");
+
+                // Check if it's an image menu
+                if (menuFromWeekday.selectFirst("figure.wp-block-image") != null) {
+                    Element imgElementMenu = menuFromWeekday.selectFirst("img");
+                    if (imgElementMenu != null) {
+                        return new MenuResult(imgElementMenu);
+                    }
+                }
+
+                // If it's a table menu
+                if (menuFromWeekday.selectFirst("figure.wp-block-table") != null) {
+                    Elements tableRows = menuFromWeekday.select("table tbody tr");
+                    return new MenuResult(tableRows);
+                }
+            }
+        }
+
+        // Fallback: If no valid menu found, try the parent and sibling traversal approach
+        System.out.println("Falling back to parent and sibling traversal...");
+        Element parentElement = titleContainingDate.parent();
         Element menuFigure = parentElement.nextElementSibling();
 
         while (menuFigure != null && !menuFigure.tagName().equals("figure")) {
@@ -139,9 +162,9 @@ public class ScraperRU implements IScraperRU {
             throw new RuntimeException("No menu figure found after the date.");
         }
 
-        System.out.println("Menu from weekday: " + menuFigure);
+        System.out.println("Menu from fallback approach: " + menuFigure);
 
-// Check if it's an image menu
+        // Check if it's an image menu
         if (menuFigure.selectFirst("figure.wp-block-image") != null) {
             Element imgElementMenu = menuFigure.selectFirst("img");
             if (imgElementMenu != null) {
@@ -149,13 +172,15 @@ public class ScraperRU implements IScraperRU {
             }
         }
 
-// If it's a table menu
+        // If it's a table menu
         if (menuFigure.selectFirst("figure.wp-block-table") != null) {
             Elements tableRows = menuFigure.select("table tbody tr");
             return new MenuResult(tableRows);
         }
+
         throw new RuntimeException("No menu found for the specified date.");
     }
+
 
     @Override
     public String extractTextFromHtml(String htmlContent) {
