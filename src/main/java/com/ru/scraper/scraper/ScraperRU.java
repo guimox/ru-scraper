@@ -129,23 +129,20 @@ public class ScraperRU implements IScraperRU {
         System.out.println("First try - Menu from weekday: " + menuFromWeekday);
 
         if (menuFromWeekday != null) {
-            // Check if it's a valid figure
+            // Check if it's a valid figure with table
             if (menuFromWeekday.tagName().equals("figure") && menuFromWeekday.hasClass("wp-block-table")) {
                 System.out.println("Menu found via nextElementSibling approach.");
-
-                // Check if it's an image menu
-                if (menuFromWeekday.selectFirst("figure.wp-block-image") != null) {
-                    Element imgElementMenu = menuFromWeekday.selectFirst("img");
-                    if (imgElementMenu != null) {
-                        return new MenuResult(imgElementMenu);
-                    }
-                }
-
                 // If it's a table menu
                 if (menuFromWeekday.selectFirst("figure.wp-block-table") != null) {
                     Elements tableRows = menuFromWeekday.select("table tbody tr");
                     return new MenuResult(tableRows);
                 }
+            }
+            // Check for image menu
+            Element imgElement = menuFromWeekday.selectFirst("img");
+            if (imgElement != null) {
+                System.out.println("Found menu image: " + imgElement.attr("src"));
+                return new MenuResult(imgElement);
             }
         }
 
