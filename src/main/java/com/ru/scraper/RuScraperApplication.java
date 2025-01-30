@@ -36,9 +36,10 @@ public class RuScraperApplication {
                 LocalDateTime javaLocalDateTime = utils.convertToLocalDateTime(jodaDateTime);
                 return scrapService.scrape(javaLocalDateTime);
             } catch (Exception e) {
-                e.printStackTrace();
-                return "Error when starting the function: " + e.getMessage();
+                e.printStackTrace();  // Log the error
+                throw new RuntimeException("Error when starting the function", e);
             }
         };
     }
+
 }
