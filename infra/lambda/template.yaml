@@ -1,0 +1,130 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Application Model template describing your function.
+Parameters:
+  RUCodeAWS:
+    Type: String
+    Description: Code for RU Scraper Bot
+  RUNameAWS:
+    Type: String
+    Description: Name of RU location
+  RUUrlAWS:
+    Type: String
+    Description: URL for RU menu
+Resources:
+  ruscraperbot:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Description: ''
+      MemorySize: 512
+      Timeout: 18
+      Handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker
+      Runtime: java17
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      Environment:
+        Variables:
+          RU_CODE_AWS: !Ref RUCodeAWS
+          RU_NAME_AWS: !Ref RUNameAWS
+          RU_URL_AWS: !Ref RUUrlAWS
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+        DestinationConfig:
+          OnSuccess:
+            Destination:
+              Ref: LambdaDestinationSuccess2
+            Type: Lambda
+      PackageType: Zip
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ec2:DescribeNetworkInterfaces
+                - ec2:CreateNetworkInterface
+                - ec2:DeleteNetworkInterface
+                - ec2:DescribeInstances
+                - ec2:AttachNetworkInterface
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+              Resource: arn:aws:logs:sa-east-1:624755431220:*
+            - Effect: Allow
+              Action:
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource:
+                - >-
+                  arn:aws:logs:sa-east-1:624755431220:log-group:/aws/lambda/ru-scraper-bot:*
+            - Effect: Allow
+              Action:
+                - ec2:DescribeNetworkInterfaces
+                - ec2:CreateNetworkInterface
+                - ec2:DeleteNetworkInterface
+                - ec2:DescribeInstances
+                - ec2:AttachNetworkInterface
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: arn:aws:lambda:sa-east-1:624755431220:function:ru-whatsapp*
+            - Action:
+                - ec2:*
+              Effect: Allow
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - elasticloadbalancing:*
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - cloudwatch:*
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - autoscaling:*
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - iam:CreateServiceLinkedRole
+              Resource: '*'
+              Condition:
+                StringEquals:
+                  iam:AWSServiceName:
+                    - autoscaling.amazonaws.com
+                    - ec2scheduled.amazonaws.com
+                    - elasticloadbalancing.amazonaws.com
+                    - spot.amazonaws.com
+                    - spotfleet.amazonaws.com
+                    - transitgateway.amazonaws.com
+      RecursiveLoop: Terminate
+      SnapStart:
+        ApplyOn: None
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-0ac3664b6569a98d0
+        SubnetIds:
+          - subnet-0ceba347a7ad98e0c
+        Ipv6AllowedForDualStack: true
+      Events:
+        Schedule2:
+          Type: Schedule
+          Properties:
+            Schedule: cron(30 8 ? 2-12 2-6 *)
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+  LambdaDestinationSuccess2:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: console.log("Hello world!")
+      Runtime: nodejs20x
+      Handler: index.js
+      PackageType: zip
+      FunctionName: LambdaDestinationSuccess2
+      Policies:
+        LambdaInvokePolicy:
+          FunctionName: LambdaDestinationSuccess2
