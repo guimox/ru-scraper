@@ -11,13 +11,7 @@ import java.util.Map;
 
 public interface IScraperRU {
 
-    MealOption createMealOption(String contentPart);
-
     MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException;
-
-    String extractTextFromHtml(String htmlContent);
-
-    String extractImageName(Element imgElement);
 
     void processContentFromRow(String htmlContent, List<MealOption> mealOptions);
 
