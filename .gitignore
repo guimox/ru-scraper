@@ -1,0 +1,59 @@
+# Compiled class files
+*.class
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# Build directories
+target/
+out/
+bin/
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+mvnw*
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Spring Boot specific
+application.properties
+application.yml
+application-*.yml
+application-*.properties
+
+# Docker
+Dockerfile
+*.dockerignore
+
+# Security
+.env
+secrets/
