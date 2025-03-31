@@ -36,8 +36,10 @@ public class RuScraperApplication {
                 LocalDateTime javaLocalDateTime = utils.convertToLocalDateTime(jodaDateTime);
                 return scrapService.scrape(javaLocalDateTime);
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // Restore the interrupted status
-                throw new RuntimeException("Scraping was interrupted: " + e.getMessage(), e);
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Scraping interrupted", e);
+            } catch (Exception e) {
+                throw new RuntimeException("Scraping failed", e);
             }
         };
     }
