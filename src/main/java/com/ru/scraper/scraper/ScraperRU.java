@@ -111,6 +111,7 @@ public class ScraperRU implements IScraperRU {
     public MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException {
         System.out.println("Trying to get a menu for the day " + formattedDate);
 
+        // Find the element containing the date
         Element titleContainingDate = htmlDocument.selectFirst("p > strong:contains(" + formattedDate + ")");
         if (titleContainingDate == null) {
             titleContainingDate = htmlDocument.selectFirst("strong:contains(" + formattedDate + ")");
@@ -126,48 +127,30 @@ public class ScraperRU implements IScraperRU {
             throw new RuntimeException("No menu found with the given date " + formattedDate);
         }
 
+        // First, check if the next sibling of the date element is a valid menu container
         Element potentialMenuContainer = null;
         Element nextSibling = titleContainingDate.nextElementSibling();
         if (isValidMenuContainer(nextSibling)) {
             potentialMenuContainer = nextSibling;
         }
 
+        // If not found, check if the next sibling of the parent element is a valid menu container
         if (potentialMenuContainer == null) {
             Element parent = titleContainingDate.parent();
             if (parent != null) {
                 Element parentsNextSibling = parent.nextElementSibling();
                 if (isValidMenuContainer(parentsNextSibling)) {
                     potentialMenuContainer = parentsNextSibling;
-                } else {
-                    Element parentsNextSiblingNext = parentsNextSibling != null ? parentsNextSibling.nextElementSibling() : null;
-                    if (isValidMenuContainer(parentsNextSiblingNext)) {
-                        potentialMenuContainer = parentsNextSiblingNext;
-                    }
                 }
             }
         }
 
+        // If no valid menu container found, throw an exception
         if (potentialMenuContainer == null) {
-            Element searchStartElement = titleContainingDate.parent() != null ? titleContainingDate.parent() : titleContainingDate;
-            Element sibling = searchStartElement.nextElementSibling();
-            while (sibling != null) {
-                if (isValidMenuContainer(sibling)) {
-                    potentialMenuContainer = sibling;
-                    break;
-                }
-                Element containedFigure = sibling.selectFirst("figure.wp-block-table, figure.wp-block-image");
-                if (isValidMenuContainer(containedFigure)) {
-                    potentialMenuContainer = containedFigure;
-                    break;
-                }
-                sibling = sibling.nextElementSibling();
-            }
+            throw new RuntimeException("Menu not found for date " + formattedDate);
         }
 
-        if (potentialMenuContainer == null) {
-            throw new RuntimeException("Could not locate a valid menu table or image container following the date element for " + formattedDate);
-        }
-
+        // Process the found menu container
         Element imgElement = potentialMenuContainer.selectFirst("figure.wp-block-image img, img");
         if (imgElement != null && potentialMenuContainer.selectFirst("table") == null) {
             return new MenuResult(imgElement);
@@ -184,6 +167,12 @@ public class ScraperRU implements IScraperRU {
         }
 
         throw new RuntimeException("Located a potential menu container, but it didn't contain a recognizable image or table menu for " + formattedDate);
+    }
+
+    // Helper method to check if text contains a date format like DD/MM/YYYY
+    private boolean containsDateFormat(String text) {
+        // This regex matches common date formats like 01/05/2025, 1/5/2025
+        return text.matches(".*\\d{1,2}/\\d{1,2}/\\d{4}.*");
     }
 
     @Override
