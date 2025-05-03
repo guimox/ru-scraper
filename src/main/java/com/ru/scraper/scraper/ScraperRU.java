@@ -169,12 +169,6 @@ public class ScraperRU implements IScraperRU {
         throw new RuntimeException("Located a potential menu container, but it didn't contain a recognizable image or table menu for " + formattedDate);
     }
 
-    // Helper method to check if text contains a date format like DD/MM/YYYY
-    private boolean containsDateFormat(String text) {
-        // This regex matches common date formats like 01/05/2025, 1/5/2025
-        return text.matches(".*\\d{1,2}/\\d{1,2}/\\d{4}.*");
-    }
-
     @Override
     public void processContentFromRow(String htmlContent, List<MealOption> mealOptions) {
         Document doc = Jsoup.parseBodyFragment(htmlContent);
@@ -185,8 +179,7 @@ public class ScraperRU implements IScraperRU {
 
         // First pass: collect all text and icons
         for (Node node : rowHtml.childNodes()) {
-            if (node instanceof TextNode) {
-                TextNode textNode = (TextNode) node;
+            if (node instanceof TextNode textNode) {
                 String text = textNode.getWholeText().trim();
                 text = text.replaceAll("\\s+", " ").trim();
                 if (text.startsWith("\"") && text.endsWith("\"") && text.length() > 1) {

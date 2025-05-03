@@ -65,7 +65,6 @@ public class ScrapService implements IScrapService {
         }
 
         Elements mealRows = menuResult.getTableRows();
-        System.out.println("Meals found: " + mealRows);
 
         for (Element element : mealRows) {
             Element tdElement = element.select("td").first();
