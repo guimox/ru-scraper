@@ -30,11 +30,11 @@ public class RuScraperApplication {
     public Function<ScheduledEvent, ?> scraperMenu() {
         return (input) -> {
             try {
-                System.out.println("TIME TRIGGERED: " + input.getTime().toString());
-                System.setProperty("java.net.preferIPv6Addresses", "true");
-                DateTime jodaDateTime = input.getTime();
-                LocalDateTime javaLocalDateTime = utils.convertToLocalDateTime(jodaDateTime);
-                return scrapService.scrape(javaLocalDateTime);
+                LocalDateTime currentDateTime = utils.convertToLocalDateTime(input.getTime());
+                LocalDateTime nextDay = currentDateTime.plusDays(1);
+                System.out.println("Current date: " + utils.getFormattedDate(currentDateTime));
+                System.out.println("Next day date: " + utils.getFormattedDate(nextDay));
+                return scrapService.scrape(nextDay);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Scraping interrupted", e);

@@ -5,8 +5,7 @@ import com.ru.scraper.data.response.ResponseMenu;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,6 @@ public class ResponseMenuBuilder implements IResponseMenuBuilder {
 
     public ResponseMenu buildBaseMenu() {
         ResponseMenu responseMenu = new ResponseMenu();
-        responseMenu.setDate(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
         responseMenu.setRuCode(ruKey);
         responseMenu.setRuName(ruName);
         responseMenu.setRuUrl(ruUrl);
@@ -32,9 +30,10 @@ public class ResponseMenuBuilder implements IResponseMenuBuilder {
     }
 
     @Override
-    public ResponseMenu createResponseMenu(Map<String, List<MealOption>> meals, List<String> served) {
+    public ResponseMenu createResponseMenu(LocalDateTime dateMenu, Map<String, List<MealOption>> meals, List<String> served) {
         ResponseMenu responseMenu = buildBaseMenu();
         responseMenu.setMeals(meals);
+        responseMenu.setDate(dateMenu);
         responseMenu.setServed(served);
         return responseMenu;
     }

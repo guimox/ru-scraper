@@ -111,7 +111,6 @@ public class ScraperRU implements IScraperRU {
     public MenuResult parseTableHtml(Document htmlDocument, String formattedDate) throws InterruptedException {
         System.out.println("Trying to get a menu for the day " + formattedDate);
 
-        // Find the element containing the date
         Element titleContainingDate = htmlDocument.selectFirst("p > strong:contains(" + formattedDate + ")");
         if (titleContainingDate == null) {
             titleContainingDate = htmlDocument.selectFirst("strong:contains(" + formattedDate + ")");
@@ -127,14 +126,12 @@ public class ScraperRU implements IScraperRU {
             throw new RuntimeException("No menu found with the given date " + formattedDate);
         }
 
-        // First, check if the next sibling of the date element is a valid menu container
         Element potentialMenuContainer = null;
         Element nextSibling = titleContainingDate.nextElementSibling();
         if (isValidMenuContainer(nextSibling)) {
             potentialMenuContainer = nextSibling;
         }
 
-        // If not found, check if the next sibling of the parent element is a valid menu container
         if (potentialMenuContainer == null) {
             Element parent = titleContainingDate.parent();
             if (parent != null) {
@@ -145,12 +142,10 @@ public class ScraperRU implements IScraperRU {
             }
         }
 
-        // If no valid menu container found, throw an exception
         if (potentialMenuContainer == null) {
             throw new RuntimeException("Menu not found for date " + formattedDate);
         }
 
-        // Process the found menu container
         Element imgElement = potentialMenuContainer.selectFirst("figure.wp-block-image img, img");
         if (imgElement != null && potentialMenuContainer.selectFirst("table") == null) {
             return new MenuResult(imgElement);
@@ -177,7 +172,6 @@ public class ScraperRU implements IScraperRU {
         StringBuilder currentMealText = new StringBuilder();
         List<String> currentIcons = new ArrayList<>();
 
-        // First pass: collect all text and icons
         for (Node node : rowHtml.childNodes()) {
             if (node instanceof TextNode textNode) {
                 String text = textNode.getWholeText().trim();
@@ -187,20 +181,15 @@ public class ScraperRU implements IScraperRU {
                 }
 
                 if (!text.isEmpty()) {
-                    // Check if this looks like a continuation of previous text
-                    // by examining if it starts with a lowercase letter or specific connectors
                     boolean isContinuation = text.startsWith("e ") || text.startsWith("com ") ||
                             text.startsWith("ou ") || text.startsWith("de ") ||
                             text.startsWith("à ") || text.startsWith("ao ") ||
                             (text.length() > 0 && Character.isLowerCase(text.charAt(0)));
 
                     if (isContinuation && currentMealText.length() > 0) {
-                        // This is a continuation of the previous text
                         currentMealText.append(" ").append(text);
                     } else {
-                        // This is a new meal item
                         if (currentMealText.length() > 0) {
-                            // Add the previous meal option to the list
                             MealOption mealOption = new MealOption();
                             mealOption.setName(currentMealText.toString());
                             for (String icon : currentIcons) {
@@ -208,7 +197,6 @@ public class ScraperRU implements IScraperRU {
                             }
                             mealOptions.add(mealOption);
 
-                            // Reset for the new meal
                             currentMealText = new StringBuilder();
                             currentIcons = new ArrayList<>();
                         }
@@ -225,7 +213,6 @@ public class ScraperRU implements IScraperRU {
             }
         }
 
-        // Add the last meal option if there's any
         if (currentMealText.length() > 0) {
             MealOption mealOption = new MealOption();
             mealOption.setName(currentMealText.toString());

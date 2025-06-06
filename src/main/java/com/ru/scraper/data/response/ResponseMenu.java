@@ -3,14 +3,14 @@ package com.ru.scraper.data.response;
 import com.ru.scraper.data.meal.MealOption;
 import org.springframework.stereotype.Component;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class ResponseMenu {
 
-    private ZonedDateTime date;
+    private LocalDateTime date;
     private String imgMenu;
     private String ruName;
     private String ruUrl;
@@ -50,11 +50,11 @@ public class ResponseMenu {
         this.ruCode = ruCode;
     }
 
-    public ZonedDateTime getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(ZonedDateTime date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

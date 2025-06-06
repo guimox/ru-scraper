@@ -82,6 +82,6 @@ public class ScrapService implements IScrapService {
         }
 
         utils.updateMeals(meals, mealOptions, mealPeriodTitle);
-        return responseMenuBuilder.createResponseMenu(meals, served);
+        return responseMenuBuilder.createResponseMenu(dateToScrap, meals, served);
     }
 }
