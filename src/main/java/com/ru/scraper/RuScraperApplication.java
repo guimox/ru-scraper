@@ -31,7 +31,7 @@ public class RuScraperApplication {
         return (input) -> {
             try {
                 LocalDateTime currentDateTime = utils.convertToLocalDateTime(input.getTime());
-                LocalDateTime nextDay = currentDateTime;
+                LocalDateTime nextDay = currentDateTime.plusDays(1);
                 System.out.println("Current date: " + utils.getFormattedDate(currentDateTime));
                 System.out.println("Next day date: " + utils.getFormattedDate(nextDay));
                 return scrapService.scrape(nextDay);
