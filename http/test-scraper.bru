@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: http://localhost:8080/api/scraper/menu
+  url: http://localhost:8080/api/scraper/menu?targetDateOffset=0
   body: none
   auth: none
+}
+
+params:query {
+  targetDateOffset: 0
 }

@@ -48,6 +48,7 @@ Thumbs.db
 application.properties
 application.yml
 application-*.yml
+application-local.yml
 application-*.properties
 
 # Docker
