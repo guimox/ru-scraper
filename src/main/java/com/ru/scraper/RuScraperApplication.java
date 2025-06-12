@@ -54,15 +54,24 @@ public class RuScraperApplication {
             System.out.println("Trigger time: " + utils.getFormattedDateTime(triggerDateTime));
             System.out.println("Target scraping date: " + utils.getFormattedDateTime(targetDateTime));
 
-            if (!executionStateService.isScrapingNeeded(ruCode, targetDateTime)) {
-                String skipMessage = "Scraping skipped - already successful for " + ruCode + " on " + utils.getFormattedDateTime(targetDateTime);
-                System.out.println(skipMessage);
-                return "Skipped menu because one was already sent";
+            try {
+                System.out.println("Checking if scraping is needed...");
+                if (!executionStateService.isScrapingNeeded(ruCode, targetDateTime)) {
+                    String skipMessage = "Scraping skipped - already successful for " + ruCode + " on " + utils.getFormattedDateTime(targetDateTime);
+                    System.out.println(skipMessage);
+                    return "Skipped menu because one was already sent";
+                }
+                System.out.println("Scraping is needed, proceeding...");
+            } catch (Exception e) {
+                System.out.println("Error checking scraping state: " + e.getMessage());
+                e.printStackTrace();
+                throw e;
             }
 
             System.out.println("Starting scraping process for " + ruCode + "...");
 
             try {
+                System.out.println("Trying to scrap the menu from the given date and time");
                 Object result = scrapService.scrape(targetDateTime);
 
                 executionStateService.saveSuccessfulExecution(triggerDateTime, ruCode);
