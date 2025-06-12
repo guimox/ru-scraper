@@ -1,8 +1,6 @@
 package com.ru.scraper.controller;
 
-import com.amazonaws.services.lambda.runtime.events.ScheduledEvent;
 import com.ru.scraper.RuScraperApplication;
-import org.joda.time.DateTime;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,13 +23,19 @@ public class ScraperController {
     }
 
     @GetMapping("/menu")
-    public Object getScraperMenu(@RequestParam(defaultValue = "0") int daysOffset) {
+    public Object getScraperMenu(@RequestParam(defaultValue = "1") int targetDateOffset) {
         try {
-            ScheduledEvent event = new ScheduledEvent();
-            event.setTime(new DateTime().plusDays(daysOffset));
+            Map<String, Object> eventPayload = new HashMap<>();
 
-            Function<ScheduledEvent, ?> scraperFunction = ruScraperApplication.scraperMenu();
-            return scraperFunction.apply(event);
+            String triggerTime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+            eventPayload.put("time", triggerTime);
+            eventPayload.put("targetDateOffset", targetDateOffset);
+            eventPayload.put("executionType", "scheduled");
+            System.out.println("Simulating EventBridge payload: " + eventPayload);
+
+            Function<Map<String, Object>, ?> scraperFunction = ruScraperApplication.scraperMenu();
+            return scraperFunction.apply(eventPayload);
+
         } catch (Exception e) {
             e.printStackTrace();
             return "Error: " + e.getMessage();
