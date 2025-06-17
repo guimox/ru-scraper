@@ -8,6 +8,7 @@ phases:
       - echo "Installing Maven..."
       - apt-get update
       - apt-get install -y maven
+      - echo "Current branch is $CODEBUILD_SOURCE_VERSION"
   build:
     commands:
       - echo "Building Java Lambda function..."
@@ -17,16 +18,27 @@ phases:
       - echo "Zipping deployment package..."
       - cp target/ru-scraper-3.1.3-aws.jar ru-scraper.zip
 
-      - echo "Updating Lambda Function (Bot)..."
-      - aws lambda update-function-code --function-name ru-scraper-bot --zip-file fileb://ru-scraper.zip --region sa-east-1
+      - |
+        if [[ "$CODEBUILD_SOURCE_VERSION" == *"homolog"* ]]; then
+          echo "Deploying to testing environment only (homolog branch detected)..."
+          echo "Updating Lambda Function (Testing)..."
+          aws lambda update-function-code --function-name ru-scraper-testing --zip-file fileb://ru-scraper.zip --region sa-east-1
+        else
+          echo "Deploying to all production environments..."
+          echo "Updating Lambda Function (Bot)..."
+          aws lambda update-function-code --function-name ru-scraper-bot --zip-file fileb://ru-scraper.zip --region sa-east-1
 
-      - echo "Updating Lambda Function (Pol)..."
-      - aws lambda update-function-code --function-name ru-scraper-pol --zip-file fileb://ru-scraper.zip --region sa-east-1
+          echo "Updating Lambda Function (Pol)..."
+          aws lambda update-function-code --function-name ru-scraper-pol --zip-file fileb://ru-scraper.zip --region sa-east-1
 
-      - echo "Updating Lambda Function (Cen)..."
-      - aws lambda update-function-code --function-name ru-scraper-cen --zip-file fileb://ru-scraper.zip --region sa-east-1
+          echo "Updating Lambda Function (Cen)..."
+          aws lambda update-function-code --function-name ru-scraper-cen --zip-file fileb://ru-scraper.zip --region sa-east-1
 
-      - echo "Updating Lambda Function (Agr)..."
-      - aws lambda update-function-code --function-name ru-scraper-agr --zip-file fileb://ru-scraper.zip --region sa-east-1
+          echo "Updating Lambda Function (Agr)..."
+          aws lambda update-function-code --function-name ru-scraper-agr --zip-file fileb://ru-scraper.zip --region sa-east-1
+
+          echo "Updating Lambda Function (Testing)..."
+          aws lambda update-function-code --function-name ru-scraper-testing --zip-file fileb://ru-scraper.zip --region sa-east-1
+        fi
 
       - echo "Finished buildspec process"

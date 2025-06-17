@@ -28,9 +28,9 @@ public class ScrapService implements IScrapService {
     private final ScraperRU scraperRU;
     private final Utils utils;
 
-    @Value("${RU_CODE}")
+    @Value("${ru.code}")
     private String ruKey;
-    @Value("${RU_URL}")
+    @Value("${ru.url}")
     private String ruUrl;
 
     public ScrapService(ResponseMenuBuilder responseMenuBuilder, ScraperRU scraperRU, ScraperHelper scraperHelper, Utils utils) {
@@ -42,7 +42,7 @@ public class ScrapService implements IScrapService {
 
     public ResponseMenu scrape(LocalDateTime dateToScrap) throws InterruptedException {
         Document documentFromUrl = scraperRU.connectScraper(ruUrl);
-        String formattedDate = utils.getFormattedDate(dateToScrap);
+        String formattedDate = utils.getFormattedDateTime(dateToScrap);
         MenuResult menuResult = scraperRU.parseTableHtml(documentFromUrl, formattedDate);
 
         if (menuResult == null) {

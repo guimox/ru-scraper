@@ -12,13 +12,13 @@ import java.util.Map;
 @Component
 public class ResponseMenuBuilder implements IResponseMenuBuilder {
 
-    @Value("${RU_CODE}")
+    @Value("${ru.code}")
     private String ruKey;
 
-    @Value("${RU_URL}")
+    @Value("${ru.url}")
     private String ruUrl;
 
-    @Value("${RU_NAME}")
+    @Value("${ru.name}")
     private String ruName;
 
     public ResponseMenu buildBaseMenu() {

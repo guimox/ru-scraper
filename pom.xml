@@ -14,15 +14,21 @@
             <properties>
                 <activatedProperties>dev</activatedProperties>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>prd</id>
             <properties>
                 <activatedProperties>prd</activatedProperties>
             </properties>
+        </profile>
+        <profile>
+            <id>local</id>
+            <properties>
+                <activatedProperties>local</activatedProperties>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
     <groupId>com.scraper</groupId>
@@ -34,6 +40,11 @@
         <wrapper.version>1.0.29.RELEASE</wrapper.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-dynamodb</artifactId>
+            <version>1.12.400</version>
+        </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-events</artifactId>

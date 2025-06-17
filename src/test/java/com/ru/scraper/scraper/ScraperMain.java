@@ -10,6 +10,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,11 +36,14 @@ class ScraperRUTest {
         // Create a test event
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "{ \"time\": \"2024-08-17T00:00:00Z\" }";
-        ScheduledEvent testEvent = objectMapper.readValue(json, ScheduledEvent.class);
+        Map<String, Object> eventPayload = new HashMap<>();
+
+        String triggerTime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+        eventPayload.put("time", triggerTime);
 
         // Get the function and apply the event
-        Function<ScheduledEvent, ?> function = application.scraperMenu();
-        Object result = function.apply(testEvent);
+        Function<Map<String, Object>, ?> scraperFunction  = application.scraperMenu();
+        Object result = scraperFunction.apply(eventPayload);
 
         LocalDateTime localDateTime = LocalDateTime.now();
 
