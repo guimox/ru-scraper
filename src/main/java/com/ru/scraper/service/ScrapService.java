@@ -42,7 +42,7 @@ public class ScrapService implements IScrapService {
 
     public ResponseMenu scrape(LocalDateTime dateToScrap) throws InterruptedException {
         Document documentFromUrl = scraperRU.connectScraper(ruUrl);
-        String formattedDate = utils.getFormattedDateTime(dateToScrap);
+        String formattedDate = utils.getFormattedDate(dateToScrap);
         MenuResult menuResult = scraperRU.parseTableHtml(documentFromUrl, formattedDate);
 
         if (menuResult == null) {

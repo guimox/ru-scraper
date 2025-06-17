@@ -17,8 +17,12 @@ import java.util.Map;
 @Component
 public class Utils {
 
-    public String getFormattedDateTime(LocalDateTime date) {
+    public String getFormattedDate(LocalDateTime date) {
         return date.format(DateTimeFormatter.ofPattern("dd/MM"));
+    }
+
+    public String getFullDateTime(LocalDateTime date) {
+        return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     }
 
     public void updateMeals(Map<String, List<MealOption>> meals, List<MealOption> mealOptions, String mealPeriodTitle) {

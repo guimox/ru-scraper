@@ -27,7 +27,7 @@ public class ExecutionStateService {
         try {
             ExecutionState state = new ExecutionState(
                     "SUCCEEDED",
-                    utils.getFormattedDateTime(executionTime),
+                    utils.getFullDateTime(executionTime),
                     ruCode
             );
 
@@ -44,7 +44,7 @@ public class ExecutionStateService {
         try {
             ExecutionState state = new ExecutionState(
                     "FAILED",
-                    utils.getFormattedDateTime(executionTime),
+                    utils.getFullDateTime(executionTime),
                     ruCode,
                     errorMessage
             );
@@ -59,18 +59,18 @@ public class ExecutionStateService {
 
     public boolean isScrapingNeeded(String ruCode, LocalDateTime nextDayDate) {
         try {
-            System.out.println("Checking scraping status for ruCode: " + ruCode + " and date: " + utils.getFormattedDateTime(nextDayDate));
+            System.out.println("Checking scraping status for ruCode: " + ruCode + " and date: " + utils.getFormattedDate(nextDayDate));
 
             ExecutionState lastExecution = getLastExecutionForDateAndRuCode(ruCode, nextDayDate);
 
             if (lastExecution == null) {
-                System.out.println("No previous execution found for ruCode: " + ruCode + " and date: " + utils.getFormattedDateTime(nextDayDate));
+                System.out.println("No previous execution found for ruCode: " + ruCode + " and date: " + utils.getFormattedDate(nextDayDate));
                 return true;
             }
 
             boolean isNeeded = !"SUCCEEDED".equals(lastExecution.getStatus());
 
-            System.out.println("Last execution for ruCode: " + ruCode + " and date: " + utils.getFormattedDateTime(nextDayDate) +
+            System.out.println("Last execution for ruCode: " + ruCode + " and date: " + utils.getFormattedDate(nextDayDate) +
                     " was: " + lastExecution.getStatus() +
                     ". Scraping needed: " + isNeeded);
 
@@ -89,7 +89,7 @@ public class ExecutionStateService {
 
     private ExecutionState getLastExecutionForDateAndRuCode(String ruCode, LocalDateTime localDate) {
         try {
-            String formattedDate = utils.getFormattedDateTime(localDate);
+            String formattedDate = utils.getFormattedDate(localDate);
             System.out.println("Scanning DynamoDB for ruCode: " + ruCode + " and formatted date: " + formattedDate);
 
             DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();

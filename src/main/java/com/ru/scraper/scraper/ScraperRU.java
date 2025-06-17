@@ -30,12 +30,10 @@ public class ScraperRU implements IScraperRU {
     private static final int MAX_RETRIES = 4;
     private final Utils utils;
     private final ScraperHelper scraperHelper;
-    private final String ruUrl;
 
-    public ScraperRU(Utils utils, ScraperHelper scraperHelper, @Value("${ru.url}") String ruUrl) {
+    public ScraperRU(Utils utils, ScraperHelper scraperHelper) {
         this.scraperHelper = scraperHelper;
         this.utils = utils;
-        this.ruUrl = ruUrl;
     }
 
     public Document connectScraper(String webURL) throws InterruptedException {

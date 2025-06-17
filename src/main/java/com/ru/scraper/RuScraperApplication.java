@@ -1,6 +1,5 @@
 package com.ru.scraper;
 
-import com.amazonaws.services.lambda.runtime.events.ScheduledEvent;
 import com.ru.scraper.helper.Utils;
 import com.ru.scraper.service.ScrapService;
 import com.ru.scraper.store.service.ExecutionStateService;
@@ -52,8 +51,8 @@ public class RuScraperApplication {
                     targetDateTime = triggerDateTime.plusDays(1);
                 }
 
-                System.out.println("Trigger time: " + utils.getFormattedDateTime(triggerDateTime));
-                System.out.println("Target scraping date: " + utils.getFormattedDateTime(targetDateTime));
+                System.out.println("Trigger time: " + utils.getFormattedDate(triggerDateTime));
+                System.out.println("Target scraping date: " + utils.getFormattedDate(targetDateTime));
 
                 System.out.println("Checking if scraping is needed...");
                 boolean scrapingNeeded;
@@ -72,7 +71,7 @@ public class RuScraperApplication {
                 }
 
                 if (!scrapingNeeded) {
-                    String skipMessage = "Scraping skipped - already successful for " + ruCode + " on " + utils.getFormattedDateTime(targetDateTime);
+                    String skipMessage = "Scraping skipped - already successful for " + ruCode + " on " + utils.getFormattedDate(targetDateTime);
                     System.out.println(skipMessage);
                     return skipMessage; // Return the actual message instead of hardcoded string
                 }
