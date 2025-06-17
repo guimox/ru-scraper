@@ -1,3 +1,9 @@
-RU_CODE: POL
-RU_URL: https://pra.ufpr.br/ru/ru-central/
-RU_NAME: CENTRO POLITÉCNICO
+ru:
+  code: POL
+  url: https://pra.ufpr.br/ru/ru-central/
+  name: CENTRO POLITÉCNICOs
+aws:
+  dynamodb:
+    region: sa-east-1
+    accessKeyId: access-key
+    secretKey: secret-key

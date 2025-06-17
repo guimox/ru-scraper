@@ -32,7 +32,7 @@ public class ScraperRU implements IScraperRU {
     private final ScraperHelper scraperHelper;
     private final String ruUrl;
 
-    public ScraperRU(Utils utils, ScraperHelper scraperHelper, @Value("${RU_URL}") String ruUrl) {
+    public ScraperRU(Utils utils, ScraperHelper scraperHelper, @Value("${ru.url}") String ruUrl) {
         this.scraperHelper = scraperHelper;
         this.utils = utils;
         this.ruUrl = ruUrl;

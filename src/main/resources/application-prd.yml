@@ -1,3 +1,11 @@
-RU_CODE: ${RU_CODE_AWS}
-RU_URL: ${RU_URL_AWS}
-RU_NAME: ${RU_NAME_AWS}
+ru:
+  code: ${RU_CODE}
+  url: ${RU_URL}
+  name: ${RU_NAME}
+aws:
+  dynamodb:
+    region: ${AWS_REGION_DYNAMO}
+    accessKeyId: ${AWS_ACCESS_KEY_ID_DYNAMO}
+    secretKey: ${AWS_SECRET_ACCESS_KEY_DYNAMO}
+    table:
+      executions: ${DYNAMODB_EXECUTIONS_TABLE}

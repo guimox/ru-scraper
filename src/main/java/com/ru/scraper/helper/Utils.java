@@ -17,7 +17,7 @@ import java.util.Map;
 @Component
 public class Utils {
 
-    public String getFormattedDate(LocalDateTime date) {
+    public String getFormattedDateTime(LocalDateTime date) {
         return date.format(DateTimeFormatter.ofPattern("dd/MM"));
     }
 
