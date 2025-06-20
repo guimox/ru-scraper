@@ -89,16 +89,16 @@ public class ExecutionStateService {
 
     private ExecutionState getLastExecutionForDateAndRuCode(String ruCode, LocalDateTime localDate) {
         try {
-            String formattedDate = utils.getFormattedDate(localDate);
-            System.out.println("Scanning DynamoDB for ruCode: " + ruCode + " and formatted date: " + formattedDate);
-
             DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+
+            String formattedDate = utils.getFormattedDate(localDate); // "20/06/2025"
+            System.out.println("Scanning DynamoDB for ruCode: " + ruCode + " and date prefix: " + formattedDate);
 
             Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
             expressionAttributeValues.put(":ruCode", new AttributeValue().withS(ruCode));
-            expressionAttributeValues.put(":execution_time", new AttributeValue().withS(formattedDate));
+            expressionAttributeValues.put(":execution_date", new AttributeValue().withS(formattedDate));
 
-            scanExpression.setFilterExpression("ru_code = :ruCode AND execution_time = :execution_time");
+            scanExpression.setFilterExpression("ru_code = :ruCode AND begins_with(execution_time, :execution_date)");
             scanExpression.setExpressionAttributeValues(expressionAttributeValues);
 
             System.out.println("Executing DynamoDB scan...");

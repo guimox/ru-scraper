@@ -57,7 +57,7 @@ public class RuScraperApplication {
                 System.out.println("Checking if scraping is needed...");
                 boolean scrapingNeeded;
                 try {
-                    scrapingNeeded = executionStateService.isScrapingNeeded(ruCode, targetDateTime);
+                    scrapingNeeded = executionStateService.isScrapingNeeded(ruCode, triggerDateTime);
                 } catch (Exception e) {
                     System.err.println("Error checking scraping state: " + e.getMessage());
                     e.printStackTrace();
