@@ -3,9 +3,12 @@ ru:
   url: ${RU_URL}
   name: ${RU_NAME}
 aws:
+  s3:
+    bucket-name: ru-menu-images
   dynamodb:
-    region: ${AWS_REGION_DYNAMO}
-    accessKeyId: ${AWS_ACCESS_KEY_ID_DYNAMO}
-    secretKey: ${AWS_SECRET_ACCESS_KEY_DYNAMO}
     table:
       executions: ${DYNAMODB_EXECUTIONS_TABLE}
+  accessKeyId: ${AWS_ACCESS_KEY_ID_DYNAMO}
+  secretKey: ${AWS_SECRET_ACCESS_KEY_DYNAMO}
+  region: ${AWS_REGION_DYNAMO}
+

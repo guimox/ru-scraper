@@ -1,10 +1,15 @@
 package com.ru.scraper.helper;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.ru.scraper.data.meal.MealOption;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.LocalDateTime;
@@ -33,7 +38,7 @@ public class Utils {
 
     public boolean isInternetAvailable() {
         try {
-            final URL url = new URL("http://www.google.com");
+            final URL url = new URL("https://www.google.com");
             final URLConnection conn = url.openConnection();
             conn.connect();
             conn.getInputStream().close();
@@ -49,4 +54,5 @@ public class Utils {
                 ZoneId.systemDefault()
         );
     }
+
 }
