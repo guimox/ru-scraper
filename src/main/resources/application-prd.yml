@@ -3,9 +3,6 @@ ru:
   url: ${RU_URL}
   name: ${RU_NAME}
 aws:
-  dynamodb:
-    region: ${AWS_REGION_DYNAMO}
-    accessKeyId: ${AWS_ACCESS_KEY_ID_DYNAMO}
-    secretKey: ${AWS_SECRET_ACCESS_KEY_DYNAMO}
-    table:
-      executions: ${DYNAMODB_EXECUTIONS_TABLE}
+  region: ${AWS_REGION_DYNAMO}
+  accessKeyId: ${AWS_ACCESS_KEY_ID_DYNAMO}
+  secretKey: ${AWS_SECRET_ACCESS_KEY_DYNAMO}
