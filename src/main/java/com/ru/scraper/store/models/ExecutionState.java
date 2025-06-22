@@ -4,7 +4,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEpochDate;
-import com.ru.scraper.data.response.ResponseMenu;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -18,22 +17,27 @@ public class ExecutionState {
     private String ruCode;
     private String executionTime;
     private String errorMessage;
+    private String runType; // NEW FIELD: "PRIMARY" or "BACKUP"
     private Date expiresAt;
 
-    public ExecutionState(String status, String executionTime, String ruCode) {
+    public ExecutionState(String status, String executionTime, String ruCode, String runType) {
         this.executionId = java.util.UUID.randomUUID().toString();
         this.status = status;
         this.executionTime = executionTime;
         this.ruCode = ruCode;
+        this.runType = runType;
         this.expiresAt = Date.from(LocalDateTime.now().plusDays(5).toInstant(ZoneOffset.UTC));
     }
 
-    public ExecutionState(String status, String executionTime, String ruCode, String errorMessage) {
-        this(status, executionTime, ruCode);
+    public ExecutionState() {}
+
+    public ExecutionState(String failed, String fullDateTime, String ruCode, String runType, String errorMessage) {
+        this.status = failed;
+        this.executionTime = fullDateTime;
+        this.ruCode = ruCode;
+        this.runType = runType;
         this.errorMessage = errorMessage;
     }
-
-    public ExecutionState() {}
 
     @DynamoDBHashKey(attributeName = "id")
     public String getExecutionId() {
@@ -78,6 +82,15 @@ public class ExecutionState {
 
     public void setRuCode(String ruCode) {
         this.ruCode = ruCode;
+    }
+
+    @DynamoDBAttribute(attributeName = "run_type")
+    public String getRunType() {
+        return runType;
+    }
+
+    public void setRunType(String runType) {
+        this.runType = runType;
     }
 
     @DynamoDBTypeConvertedEpochDate

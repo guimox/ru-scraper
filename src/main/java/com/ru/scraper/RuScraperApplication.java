@@ -38,6 +38,7 @@ public class RuScraperApplication {
         return (input) -> {
             LocalDateTime triggerDateTime;
             LocalDateTime targetDateTime;
+            String runType = "PRIMARY";
 
             try {
                 if (input.containsKey("time") && input.containsKey("targetDateOffset")) {
@@ -51,58 +52,68 @@ public class RuScraperApplication {
                     targetDateTime = triggerDateTime.plusDays(1);
                 }
 
+                if (input.containsKey("runType")) {
+                    runType = (String) input.get("runType");
+                } else if (input.containsKey("isBackup") && Boolean.TRUE.equals(input.get("isBackup"))) {
+                    runType = "BACKUP";
+                }
+
+                System.out.println("Run type: " + runType);
                 System.out.println("Trigger time: " + utils.getFormattedDate(triggerDateTime));
                 System.out.println("Target scraping date: " + utils.getFormattedDate(targetDateTime));
 
-                System.out.println("Checking if scraping is needed...");
-                boolean scrapingNeeded;
-                try {
-                    scrapingNeeded = executionStateService.isScrapingNeeded(ruCode, triggerDateTime);
-                } catch (Exception e) {
-                    System.err.println("Error checking scraping state: " + e.getMessage());
-                    e.printStackTrace();
+                if ("BACKUP".equals(runType)) {
+                    System.out.println("Checking if BACKUP scraping is needed...");
+                    boolean scrapingNeeded;
+                    try {
+                        scrapingNeeded = executionStateService.isScrapingNeeded(ruCode, targetDateTime);
+                    } catch (Exception e) {
+                        System.err.println("Error checking scraping state: " + e.getMessage());
+                        e.printStackTrace();
 
-                    // Save the error state
-                    executionStateService.saveFailedExecution(triggerDateTime,
-                            "Failed to check scraping state: " + e.getMessage(), ruCode);
+                        executionStateService.saveFailedExecution(triggerDateTime,
+                                "Failed to check scraping state: " + e.getMessage(), ruCode, runType);
 
-                    // Re-throw to stop execution
-                    throw new RuntimeException("Failed to check scraping state", e);
+                        throw new RuntimeException("Failed to check scraping state", e);
+                    }
+
+                    if (!scrapingNeeded) {
+                        String skipMessage = "BACKUP scraping skipped - already successful PRIMARY run found for " +
+                                ruCode + " on " + utils.getFormattedDate(targetDateTime);
+                        System.out.println(skipMessage);
+                        return skipMessage;
+                    }
+                    System.out.println("BACKUP scraping is needed, proceeding...");
+                } else {
+                    System.out.println("PRIMARY run - proceeding without checking previous executions...");
                 }
 
-                if (!scrapingNeeded) {
-                    String skipMessage = "Scraping skipped - already successful for " + ruCode + " on " + utils.getFormattedDate(targetDateTime);
-                    System.out.println(skipMessage);
-                    return skipMessage; // Return the actual message instead of hardcoded string
-                }
-
-                System.out.println("Scraping is needed, proceeding...");
-                System.out.println("Starting scraping process for " + ruCode + "...");
+                System.out.println("Starting " + runType + " scraping process for " + ruCode + "...");
 
                 try {
                     System.out.println("Trying to scrap the menu from the given date and time");
                     Object result = scrapService.scrape(targetDateTime);
 
-                    executionStateService.saveSuccessfulExecution(triggerDateTime, ruCode);
+                    executionStateService.saveSuccessfulExecution(triggerDateTime, ruCode, runType);
 
                     return result;
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    String errorMsg = "Scraping interrupted for " + ruCode + ": " + e.getMessage();
+                    String errorMsg = runType + " scraping interrupted for " + ruCode + ": " + e.getMessage();
                     System.err.println(errorMsg);
                     e.printStackTrace();
 
-                    executionStateService.saveFailedExecution(triggerDateTime, errorMsg, ruCode);
+                    executionStateService.saveFailedExecution(triggerDateTime, errorMsg, ruCode, runType);
 
                     throw new RuntimeException(errorMsg, e);
 
                 } catch (Exception e) {
-                    String errorMsg = "Scraping failed for " + ruCode + ": " + e.getMessage();
+                    String errorMsg = runType + " scraping failed for " + ruCode + ": " + e.getMessage();
                     System.err.println(errorMsg);
                     e.printStackTrace();
 
-                    executionStateService.saveFailedExecution(triggerDateTime, errorMsg, ruCode);
+                    executionStateService.saveFailedExecution(triggerDateTime, errorMsg, ruCode, runType);
 
                     throw new RuntimeException(errorMsg, e);
                 }
@@ -113,4 +124,5 @@ public class RuScraperApplication {
                 throw e;
             }
         };
-    }}
+    }
+}
