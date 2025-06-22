@@ -10,7 +10,7 @@ RU Scraper is a component of the [RU Menu project](https://github.com/guimox/ru-
 - Supports both table-based and image-based menu formats
 - Stores execution states in DynamoDB for tracking successful/failed scraping attempts
 - Runs on a scheduled basis via AWS EventBridge
-- Provides REST API endpoint for manual triggering
+- Provides REST API endpoint for manual/local triggering
 
 ## Architecture
 
