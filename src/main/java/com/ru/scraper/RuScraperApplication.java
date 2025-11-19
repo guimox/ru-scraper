@@ -45,7 +45,6 @@ public class RuScraperApplication {
                     triggerDateTime = utils.convertToLocalDateTime(DateTime.parse((String) input.get("time")));
                     int offset = ((Number) input.get("targetDateOffset")).intValue();
                     targetDateTime = triggerDateTime.plusDays(offset);
-                    System.out.println("New approach using input transformer worked");
                 } else {
                     System.out.println("Using the default behaviour of getting the date now");
                     triggerDateTime = LocalDateTime.now();
@@ -104,7 +103,7 @@ public class RuScraperApplication {
                     System.err.println(errorMsg);
                     e.printStackTrace();
 
-                    executionStateService.saveFailedExecution(triggerDateTime, errorMsg, ruCode, runType);
+                    executionStateService.saveFailedExecution(triggerDateTime, "Failed to check scraping state: " + e.getMessage(), ruCode, runType);
 
                     throw new RuntimeException(errorMsg, e);
 

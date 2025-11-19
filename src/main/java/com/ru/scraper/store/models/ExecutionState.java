@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEpoch
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.UUID;
 
 @DynamoDBTable(tableName = "ru-scraper-executions")
 public class ExecutionState {
@@ -20,12 +21,10 @@ public class ExecutionState {
     private String runType;
     private Date expiresAt;
 
-    // No-arg constructor (required by DynamoDB)
     public ExecutionState() {}
 
-    // 4-parameter constructor for successful executions
     public ExecutionState(String status, String executionTime, String ruCode, String runType) {
-        this.executionId = java.util.UUID.randomUUID().toString();
+        this.executionId = UUID.randomUUID().toString();
         this.status = status;
         this.executionTime = executionTime;
         this.ruCode = ruCode;
@@ -33,9 +32,8 @@ public class ExecutionState {
         this.expiresAt = Date.from(LocalDateTime.now().plusDays(5).toInstant(ZoneOffset.UTC));
     }
 
-    // 5-parameter constructor for failed executions (includes errorMessage)
     public ExecutionState(String status, String executionTime, String ruCode, String runType, String errorMessage) {
-        this.executionId = java.util.UUID.randomUUID().toString();
+        this.executionId = UUID.randomUUID().toString();
         this.status = status;
         this.executionTime = executionTime;
         this.ruCode = ruCode;

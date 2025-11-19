@@ -31,7 +31,7 @@ public class ScraperController {
             eventPayload.put("time", triggerTime);
             eventPayload.put("targetDateOffset", targetDateOffset);
             eventPayload.put("executionType", "scheduled");
-            eventPayload.put("runType", "PRIMARY");
+            eventPayload.put("runType", "BACKUP");
             System.out.println("Simulating EventBridge payload: " + eventPayload);
 
             Function<Map<String, Object>, ?> scraperFunction = ruScraperApplication.scraperMenu();
