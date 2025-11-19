@@ -17,9 +17,13 @@ public class ExecutionState {
     private String ruCode;
     private String executionTime;
     private String errorMessage;
-    private String runType; // NEW FIELD: "PRIMARY" or "BACKUP"
+    private String runType;
     private Date expiresAt;
 
+    // No-arg constructor (required by DynamoDB)
+    public ExecutionState() {}
+
+    // 4-parameter constructor for successful executions
     public ExecutionState(String status, String executionTime, String ruCode, String runType) {
         this.executionId = java.util.UUID.randomUUID().toString();
         this.status = status;
@@ -29,14 +33,15 @@ public class ExecutionState {
         this.expiresAt = Date.from(LocalDateTime.now().plusDays(5).toInstant(ZoneOffset.UTC));
     }
 
-    public ExecutionState() {}
-
-    public ExecutionState(String failed, String fullDateTime, String ruCode, String runType, String errorMessage) {
-        this.status = failed;
-        this.executionTime = fullDateTime;
+    // 5-parameter constructor for failed executions (includes errorMessage)
+    public ExecutionState(String status, String executionTime, String ruCode, String runType, String errorMessage) {
+        this.executionId = java.util.UUID.randomUUID().toString();
+        this.status = status;
+        this.executionTime = executionTime;
         this.ruCode = ruCode;
         this.runType = runType;
         this.errorMessage = errorMessage;
+        this.expiresAt = Date.from(LocalDateTime.now().plusDays(5).toInstant(ZoneOffset.UTC));
     }
 
     @DynamoDBHashKey(attributeName = "id")
