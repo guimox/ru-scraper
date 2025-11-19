@@ -2,7 +2,12 @@
 
 ## Overview
 
-RU Scraper is a component of the [RU Menu project](https://github.com/guimox/ru-menu) that handles web scraping of university restaurant (RU) menus. It's built as a Spring Boot application deployed as an AWS Lambda function.
+This project is part of the [RU Menu](https://github.com/guimox/ru-menu) ecosystem, which includes:
+
+- RU Scraper (this project) - Menu data scraper
+- [RU WhatsApp](https://github.com/guimox/ru-whatsapp) - WhatsApp message sender
+
+The bot sends daily menu updates to a WhatsApp channel, supporting both text-based menus and image menus.
 
 ## Features
 
