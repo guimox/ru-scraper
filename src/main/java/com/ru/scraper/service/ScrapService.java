@@ -4,7 +4,7 @@ import com.ru.scraper.data.meal.MealOption;
 import com.ru.scraper.data.response.MenuResult;
 import com.ru.scraper.data.response.ResponseMenu;
 import com.ru.scraper.exception.types.RuMenuNotFound;
-import com.ru.scraper.factory.ResponseMenuBuilder;
+import com.ru.scraper.builder.ResponseMenuBuilder;
 import com.ru.scraper.helper.ScraperHelper;
 import com.ru.scraper.helper.Utils;
 import com.ru.scraper.scraper.ScraperRU;
@@ -30,6 +30,7 @@ public class ScrapService implements IScrapService {
 
     @Value("${ru.code}")
     private String ruKey;
+
     @Value("${ru.url}")
     private String ruUrl;
 

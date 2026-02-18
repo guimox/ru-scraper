@@ -1,8 +1,10 @@
 package com.ru.scraper.store.service;
 
+import com.amazonaws.Response;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.ru.scraper.data.response.ResponseMenu;
 import com.ru.scraper.helper.Utils;
 import com.ru.scraper.store.models.ExecutionState;
 import org.springframework.stereotype.Service;
@@ -24,16 +26,14 @@ public class ExecutionStateService {
         this.dynamoDBMapper = dynamoDBMapper;
     }
 
-    public void saveSuccessfulExecution(LocalDateTime executionTime, String ruCode, String runType) {
+    public void saveSuccessfulExecution(LocalDateTime utcExecutionTime, String ruCode, String runType, ResponseMenu menu) {
         try {
-            // Ensure we're using UTC time
-            LocalDateTime utcExecutionTime = executionTime; // Should already be UTC from main method
-
             ExecutionState state = new ExecutionState(
                     "SUCCEEDED",
                     utils.getFullDateTime(utcExecutionTime),
                     ruCode,
-                    runType
+                    runType,
+                    menu
             );
 
             dynamoDBMapper.save(state);
@@ -72,13 +72,7 @@ public class ExecutionStateService {
                     " for target date: " + targetDateStr + " (UTC: " + targetDate + ")");
 
             // Look for successful PRIMARY execution for this target date within the last 24 hours
-            ExecutionState lastPrimaryExecution = getLastPrimaryExecutionForTargetDate(ruCode, targetDate);
-
-            if (lastPrimaryExecution == null) {
-                System.out.println("No successful PRIMARY execution found for ruCode: " + ruCode +
-                        " and target date: " + targetDateStr + " - BACKUP run needed");
-                return true;
-            }
+            ExecutionState lastPrimaryExecution = getLastPrimaryExecutionForTargetDate(ruCode);
 
             if ("SUCCEEDED".equals(lastPrimaryExecution.getStatus())) {
                 System.out.println("Found successful PRIMARY execution for ruCode: " + ruCode +
@@ -99,7 +93,7 @@ public class ExecutionStateService {
         }
     }
 
-    private ExecutionState getLastPrimaryExecutionForTargetDate(String ruCode, LocalDateTime targetDate) {
+    private ExecutionState getLastPrimaryExecutionForTargetDate(String ruCode) {
         try {
             LocalDateTime lookbackStart = LocalDateTime.now(ZoneOffset.UTC).minusHours(24);
             String lookbackStartStr = utils.getFormattedDate(lookbackStart);
