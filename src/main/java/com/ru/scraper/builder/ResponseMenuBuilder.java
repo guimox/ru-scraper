@@ -1,4 +1,4 @@
-package com.ru.scraper.factory;
+package com.ru.scraper.builder;
 
 import com.ru.scraper.data.meal.MealOption;
 import com.ru.scraper.data.response.ResponseMenu;

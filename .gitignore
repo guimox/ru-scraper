@@ -58,3 +58,4 @@ Dockerfile
 # Security
 .env
 secrets/
+/dependency-reduced-pom.xml

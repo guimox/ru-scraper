@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEpochDate;
+import com.ru.scraper.data.response.ResponseMenu;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -19,16 +20,18 @@ public class ExecutionState {
     private String executionTime;
     private String errorMessage;
     private String runType;
+    private ResponseMenu menu;
     private Date expiresAt;
 
     public ExecutionState() {}
 
-    public ExecutionState(String status, String executionTime, String ruCode, String runType) {
+    public ExecutionState(String status, String executionTime, String ruCode, String runType, ResponseMenu menu) {
         this.executionId = UUID.randomUUID().toString();
         this.status = status;
         this.executionTime = executionTime;
         this.ruCode = ruCode;
         this.runType = runType;
+        this.menu = menu;
         this.expiresAt = Date.from(LocalDateTime.now().plusDays(5).toInstant(ZoneOffset.UTC));
     }
 
@@ -85,6 +88,15 @@ public class ExecutionState {
 
     public void setRuCode(String ruCode) {
         this.ruCode = ruCode;
+    }
+
+    @DynamoDBAttribute(attributeName = "menu_from_execution")
+    public ResponseMenu getMenuFromExecution() {
+        return menu;
+    }
+
+    public void setMenuFromExecution(ResponseMenu menu) {
+        this.menu = menu;
     }
 
     @DynamoDBAttribute(attributeName = "run_type")

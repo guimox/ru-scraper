@@ -1,5 +1,6 @@
 package com.ru.scraper;
 
+import com.ru.scraper.data.response.ResponseMenu;
 import com.ru.scraper.helper.Utils;
 import com.ru.scraper.service.ScrapService;
 import com.ru.scraper.store.service.ExecutionStateService;
@@ -52,7 +53,7 @@ public class RuScraperApplication {
                 }
 
                 if (input.containsKey("runType")) {
-                    runType = (String) input.get("runType");
+                    runType = input.get("runType").toString();
                 } else if (input.containsKey("isBackup") && Boolean.TRUE.equals(input.get("isBackup"))) {
                     runType = "BACKUP";
                 }
@@ -91,9 +92,9 @@ public class RuScraperApplication {
 
                 try {
                     System.out.println("Trying to scrap the menu from the given date and time");
-                    Object result = scrapService.scrape(targetDateTime);
+                    ResponseMenu result = scrapService.scrape(targetDateTime);
 
-                    executionStateService.saveSuccessfulExecution(triggerDateTime, ruCode, runType);
+                    executionStateService.saveSuccessfulExecution(triggerDateTime, ruCode, runType, result);
 
                     return result;
 
@@ -120,8 +121,9 @@ public class RuScraperApplication {
             } catch (Exception e) {
                 System.err.println("Fatal error in scraperMenu: " + e.getMessage());
                 e.printStackTrace();
-                throw e;
             }
+
+            return null;
         };
     }
 }
