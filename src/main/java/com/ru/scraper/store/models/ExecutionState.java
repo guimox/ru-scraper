@@ -4,7 +4,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEpochDate;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
 import com.ru.scraper.data.response.ResponseMenu;
+import com.ru.scraper.store.converter.ResponseMenuConverter;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -90,6 +92,7 @@ public class ExecutionState {
         this.ruCode = ruCode;
     }
 
+    @DynamoDBTypeConverted(converter = ResponseMenuConverter.class)
     @DynamoDBAttribute(attributeName = "menu_from_execution")
     public ResponseMenu getMenuFromExecution() {
         return menu;

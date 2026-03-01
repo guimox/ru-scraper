@@ -1,9 +1,8 @@
 package com.ru.scraper;
 
-import com.ru.scraper.data.response.ResponseMenu;
+import com.ru.scraper.data.scraper.RunType;
 import com.ru.scraper.helper.Utils;
-import com.ru.scraper.service.ScrapService;
-import com.ru.scraper.store.service.ExecutionStateService;
+import com.ru.scraper.service.others.RunTypeOrchestrator;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -17,17 +16,15 @@ import java.util.function.Function;
 @SpringBootApplication
 public class RuScraperApplication {
 
-    private final ScrapService scrapService;
     private final Utils utils;
-    private final ExecutionStateService executionStateService;
+    private final RunTypeOrchestrator runTypeOrchestrator;
 
     @Value("${ru.code}")
     private String ruCode;
 
-    public RuScraperApplication(ScrapService scrapService, Utils utils, ExecutionStateService executionStateService) {
-        this.scrapService = scrapService;
+    public RuScraperApplication(Utils utils, RunTypeOrchestrator runTypeOrchestrator) {
         this.utils = utils;
-        this.executionStateService = executionStateService;
+        this.runTypeOrchestrator = runTypeOrchestrator;
     }
 
     public static void main(String[] args) {
@@ -39,7 +36,7 @@ public class RuScraperApplication {
         return (input) -> {
             LocalDateTime triggerDateTime;
             LocalDateTime targetDateTime;
-            String runType = "PRIMARY";
+            RunType runType = RunType.PRIMARY;
 
             try {
                 if (input.containsKey("time") && input.containsKey("targetDateOffset")) {
@@ -52,71 +49,19 @@ public class RuScraperApplication {
                     targetDateTime = triggerDateTime.plusDays(1);
                 }
 
+                // Determine run type from input parameters
                 if (input.containsKey("runType")) {
-                    runType = input.get("runType").toString();
+                    String runTypeStr = ((String) input.get("runType")).toUpperCase();
+                    runType = RunType.valueOf(runTypeStr);
                 } else if (input.containsKey("isBackup") && Boolean.TRUE.equals(input.get("isBackup"))) {
-                    runType = "BACKUP";
+                    runType = RunType.BACKUP;
                 }
 
                 System.out.println("Run type: " + runType);
                 System.out.println("Trigger time: " + utils.getFormattedDate(triggerDateTime));
                 System.out.println("Target scraping date: " + utils.getFormattedDate(targetDateTime));
 
-                if ("BACKUP".equals(runType)) {
-                    System.out.println("Checking if BACKUP scraping is needed...");
-                    boolean scrapingNeeded;
-                    try {
-                        scrapingNeeded = executionStateService.isScrapingNeeded(ruCode, targetDateTime);
-                    } catch (Exception e) {
-                        System.err.println("Error checking scraping state: " + e.getMessage());
-                        e.printStackTrace();
-
-                        executionStateService.saveFailedExecution(triggerDateTime,
-                                "Failed to check scraping state: " + e.getMessage(), ruCode, runType);
-
-                        throw new RuntimeException("Failed to check scraping state", e);
-                    }
-
-                    if (!scrapingNeeded) {
-                        String skipMessage = "BACKUP scraping skipped - already successful PRIMARY run found for " +
-                                ruCode + " on " + utils.getFormattedDate(targetDateTime);
-                        System.out.println(skipMessage);
-                        return skipMessage;
-                    }
-                    System.out.println("BACKUP scraping is needed, proceeding...");
-                } else {
-                    System.out.println("PRIMARY run - proceeding without checking previous executions...");
-                }
-
-                System.out.println("Starting " + runType + " scraping process for " + ruCode + "...");
-
-                try {
-                    System.out.println("Trying to scrap the menu from the given date and time");
-                    ResponseMenu result = scrapService.scrape(targetDateTime);
-
-                    executionStateService.saveSuccessfulExecution(triggerDateTime, ruCode, runType, result);
-
-                    return result;
-
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    String errorMsg = runType + " scraping interrupted for " + ruCode + ": " + e.getMessage();
-                    System.err.println(errorMsg);
-                    e.printStackTrace();
-
-                    executionStateService.saveFailedExecution(triggerDateTime, "Failed to check scraping state: " + e.getMessage(), ruCode, runType);
-
-                    throw new RuntimeException(errorMsg, e);
-
-                } catch (Exception e) {
-                    String errorMsg = runType + " scraping failed for " + ruCode + ": " + e.getMessage();
-                    System.err.println(errorMsg);
-                    e.printStackTrace();
-
-                    executionStateService.saveFailedExecution(triggerDateTime, errorMsg, ruCode, runType);
-
-                    throw new RuntimeException(errorMsg, e);
-                }
+                return runTypeOrchestrator.executeRun(runType, ruCode, targetDateTime, triggerDateTime);
 
             } catch (Exception e) {
                 System.err.println("Fatal error in scraperMenu: " + e.getMessage());
