@@ -74,6 +74,12 @@ public class ExecutionStateService {
             // Look for successful PRIMARY execution for this target date within the last 24 hours
             ExecutionState lastPrimaryExecution = getLastPrimaryExecutionForTargetDate(ruCode);
 
+            if (lastPrimaryExecution == null) {
+                System.out.println("No PRIMARY execution found for ruCode: " + ruCode +
+                        " and target date: " + targetDateStr + " - BACKUP run needed");
+                return true;
+            }
+
             if ("SUCCEEDED".equals(lastPrimaryExecution.getStatus())) {
                 System.out.println("Found successful PRIMARY execution for ruCode: " + ruCode +
                         " and target date: " + targetDateStr +
@@ -95,9 +101,10 @@ public class ExecutionStateService {
 
     private ExecutionState getLastPrimaryExecutionForTargetDate(String ruCode) {
         try {
-            LocalDateTime lookbackStart = LocalDateTime.now(ZoneOffset.UTC).minusHours(24);
+            LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+            LocalDateTime lookbackStart = now.minusHours(24);
             String lookbackStartStr = utils.getFormattedDate(lookbackStart);
-            String currentDateStr = utils.getFormattedDate(LocalDateTime.now(ZoneOffset.UTC));
+            String currentDateStr = utils.getFormattedDate(now);
 
             System.out.println("Scanning DynamoDB for PRIMARY executions for ruCode: " + ruCode +
                     " between dates: " + lookbackStartStr + " and " + currentDateStr);
@@ -119,8 +126,10 @@ public class ExecutionStateService {
                         String executionTimeStr = execution.getExecutionTime();
 
                         // Check if this execution happened within the last 24 hours
+                        // Allow for dates within the 24-hour window (including look-back date and current date)
                         boolean isRecentExecution = executionTimeStr.startsWith(currentDateStr) ||
-                                executionTimeStr.startsWith(lookbackStartStr);
+                                executionTimeStr.startsWith(lookbackStartStr) ||
+                                (executionTimeStr.compareTo(lookbackStartStr) >= 0 && executionTimeStr.compareTo(currentDateStr) <= 0);
 
                         if (isRecentExecution) {
                             System.out.println("Found recent PRIMARY execution: " + executionTimeStr +
@@ -135,7 +144,7 @@ public class ExecutionStateService {
         } catch (Exception e) {
             System.err.println("Error querying DynamoDB: " + e.getMessage());
             e.printStackTrace();
-            throw e;
+            return null;
         }
     }
 }

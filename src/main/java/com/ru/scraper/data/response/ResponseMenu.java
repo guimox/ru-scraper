@@ -1,13 +1,11 @@
 package com.ru.scraper.data.response;
 
 import com.ru.scraper.data.meal.MealOption;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-@Component
 public class ResponseMenu {
 
     private LocalDateTime date;
@@ -72,10 +70,6 @@ public class ResponseMenu {
 
     public void setServed(List<String> served) {
         this.served = served;
-    }
-
-    public void addMeal(String mealPeriod, List<MealOption> mealOptions) {
-        this.meals.put(mealPeriod, mealOptions);
     }
 
 }
