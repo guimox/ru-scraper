@@ -99,6 +99,36 @@ public class ExecutionStateService {
         }
     }
 
+    public ResponseMenu getLastSuccessfulMenu(String ruCode) {
+        try {
+            System.out.println("Retrieving last successful menu for ruCode: " + ruCode);
+
+            DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+            Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
+            expressionAttributeValues.put(":ruCode", new AttributeValue().withS(ruCode));
+            expressionAttributeValues.put(":status", new AttributeValue().withS("SUCCEEDED"));
+
+            scanExpression.setFilterExpression("ru_code = :ruCode AND #status = :status");
+            scanExpression.setExpressionAttributeNames(Map.of("#status", "status"));
+            scanExpression.setExpressionAttributeValues(expressionAttributeValues);
+
+            System.out.println("Scanning DynamoDB for successful executions...");
+            List<ExecutionState> successfulExecutions = dynamoDBMapper.scan(ExecutionState.class, scanExpression);
+            System.out.println("Found " + successfulExecutions.size() + " successful execution records");
+
+            return successfulExecutions.stream()
+                    .filter(execution -> execution.getMenuFromExecution() != null)
+                    .max((e1, e2) -> e1.getExecutionTime().compareTo(e2.getExecutionTime()))
+                    .map(ExecutionState::getMenuFromExecution)
+                    .orElse(null);
+
+        } catch (Exception e) {
+            System.err.println("Error retrieving last successful menu: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private ExecutionState getLastPrimaryExecutionForTargetDate(String ruCode) {
         try {
             LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);

@@ -23,7 +23,7 @@ public class ScraperController {
     }
 
     @GetMapping("/menu")
-    public Object getScraperMenu(@RequestParam(defaultValue = "1") int targetDateOffset) {
+    public Object getScraperMenu(@RequestParam(defaultValue = "1") int targetDateOffset, @RequestParam(defaultValue = "PRIMARY") String runType) {
         try {
             Map<String, Object> eventPayload = new HashMap<>();
 
@@ -31,7 +31,7 @@ public class ScraperController {
             eventPayload.put("time", triggerTime);
             eventPayload.put("targetDateOffset", targetDateOffset);
             eventPayload.put("executionType", "scheduled");
-            eventPayload.put("runType", "BACKUP");
+            eventPayload.put("runType", runType);
             System.out.println("Simulating EventBridge payload: " + eventPayload);
 
             Function<Map<String, Object>, ?> scraperFunction = ruScraperApplication.scraperMenu();
