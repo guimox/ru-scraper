@@ -6,6 +6,7 @@ This project is part of the [RU Menu](https://github.com/guimox/ru-menu) ecosyst
 
 - RU Scraper (this project) - Menu data scraper
 - [RU WhatsApp](https://github.com/guimox/ru-whatsapp) - WhatsApp message sender
+- [RU Counter](https://github.com/guimox/ru-counter) - Menu access counter for the scraper
 
 The bot sends daily menu updates to a WhatsApp channel, supporting both text-based menus and image menus.
 
