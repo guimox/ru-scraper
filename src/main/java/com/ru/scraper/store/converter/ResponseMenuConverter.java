@@ -16,10 +16,13 @@ public class ResponseMenuConverter implements DynamoDBTypeConverter<String, Resp
     @Override
     public String convert(ResponseMenu object) {
         try {
+            System.out.println("DEBUG converter called, object null: " + (object == null));
             if (object == null) {
                 return null;
             }
-            return objectMapper.writeValueAsString(object);
+            String json = objectMapper.writeValueAsString(object);
+            System.out.println("DEBUG serialized to: " + json);
+            return json;
         } catch (Exception e) {
             throw new RuntimeException("Failed to convert ResponseMenu to String: " + e.getMessage(), e);
         }

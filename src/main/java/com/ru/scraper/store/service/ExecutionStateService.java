@@ -27,6 +27,10 @@ public class ExecutionStateService {
     }
 
     public void saveSuccessfulExecution(LocalDateTime utcExecutionTime, String ruCode, String runType, ResponseMenu menu) {
+        System.out.println("DEBUG menu null: " + (menu == null));
+        System.out.println("DEBUG menu meals: " + (menu != null ? menu.getMeals() : "NULL"));
+        System.out.println("DEBUG menu meals empty: " + (menu != null && menu.getMeals() != null ? menu.getMeals().isEmpty() : "N/A"));
+
         try {
             ExecutionState state = new ExecutionState(
                     "SUCCEEDED",
